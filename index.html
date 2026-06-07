@@ -113,58 +113,16 @@
     .ef-btn { background: linear-gradient(135deg, #00a8e8, #0077b6); color: #fff; }
 
     /* ===== PROMO BANNER ===== */
-    .promo-banner {
-      max-width: 1200px;
-      margin: 0 auto 0;
-      padding: 0 2rem;
-    }
-    .promo-banner-inner {
-      background: linear-gradient(135deg, rgba(249,115,22,.12), rgba(244,114,182,.08), rgba(139,92,246,.1));
-      border: 1px solid rgba(249,115,22,.4);
-      border-radius: 20px;
-      padding: 1.5rem 2rem;
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      animation: promoGlow 3s ease infinite, fadeIn .8s .6s ease both;
-      position: relative;
-      overflow: hidden;
-    }
-    .promo-banner-inner::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: repeating-linear-gradient(45deg, transparent, transparent 30px, rgba(249,115,22,.03) 30px, rgba(249,115,22,.03) 31px);
-      pointer-events: none;
-    }
-    .promo-icon-wrap {
-      font-size: 2.5rem;
-      flex-shrink: 0;
-      animation: float 2.5s ease infinite;
-    }
+    .promo-banner { max-width: 1200px; margin: 0 auto 0; padding: 0 2rem; }
+    .promo-banner-inner { background: linear-gradient(135deg, rgba(249,115,22,.12), rgba(244,114,182,.08), rgba(139,92,246,.1)); border: 1px solid rgba(249,115,22,.4); border-radius: 20px; padding: 1.5rem 2rem; display: flex; align-items: center; gap: 1.5rem; animation: promoGlow 3s ease infinite, fadeIn .8s .6s ease both; position: relative; overflow: hidden; }
+    .promo-banner-inner::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(45deg, transparent, transparent 30px, rgba(249,115,22,.03) 30px, rgba(249,115,22,.03) 31px); pointer-events: none; }
+    .promo-icon-wrap { font-size: 2.5rem; flex-shrink: 0; animation: float 2.5s ease infinite; }
     .promo-content { flex: 1; min-width: 0; }
-    .promo-title {
-      font-size: 1.15rem;
-      font-weight: 900;
-      background: linear-gradient(135deg, #f97316, #f472b6);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: .3rem;
-    }
+    .promo-title { font-size: 1.15rem; font-weight: 900; background: linear-gradient(135deg, #f97316, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: .3rem; }
     .promo-desc { font-size: .875rem; color: var(--text-secondary); line-height: 1.7; }
     .promo-desc strong { color: var(--accent-cyan); }
     .promo-badge-wrap { flex-shrink: 0; text-align: center; }
-    .promo-big-badge {
-      background: linear-gradient(135deg, #f97316, #f472b6);
-      color: #fff;
-      font-size: .75rem;
-      font-weight: 900;
-      padding: .5rem 1rem;
-      border-radius: 12px;
-      line-height: 1.5;
-      white-space: nowrap;
-      box-shadow: 0 4px 20px rgba(249,115,22,.4);
-    }
+    .promo-big-badge { background: linear-gradient(135deg, #f97316, #f472b6); color: #fff; font-size: .75rem; font-weight: 900; padding: .5rem 1rem; border-radius: 12px; line-height: 1.5; white-space: nowrap; box-shadow: 0 4px 20px rgba(249,115,22,.4); }
 
     .popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.85); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem; animation: fadeIn .3s ease; }
     .popup-box { background: var(--bg-modal); border: 1px solid var(--border); border-radius: 24px; padding: 2.5rem; max-width: 440px; width: 100%; text-align: center; position: relative; animation: fadeInScale .4s cubic-bezier(.34,1.56,.64,1); box-shadow: 0 0 80px rgba(139,92,246,.2), 0 0 120px rgba(0,212,255,.1); }
@@ -195,32 +153,26 @@
     .package-popular { position: absolute; top: -1px; right: -1px; background: linear-gradient(135deg, var(--accent-orange), var(--accent-pink)); color: #fff; font-size: .55rem; font-weight: 700; padding: .15rem .4rem; border-radius: 0 12px 0 8px; }
 
     /* eFootball special package */
-    .ef-package-card {
-      border: 2px solid rgba(0,168,232,.4);
-      border-radius: 16px;
-      padding: 1.5rem;
-      text-align: center;
-      background: linear-gradient(135deg, rgba(0,168,232,.08), rgba(0,168,232,.03));
-      margin-bottom: 1.5rem;
-      cursor: pointer;
-      transition: all .2s;
-    }
-    .ef-package-card:hover, .ef-package-card.selected {
-      border-color: #00a8e8;
-      box-shadow: 0 0 30px rgba(0,168,232,.25);
-      transform: translateY(-2px);
-    }
+    .ef-package-card { border: 2px solid rgba(0,168,232,.4); border-radius: 16px; padding: 1.5rem; text-align: center; background: linear-gradient(135deg, rgba(0,168,232,.08), rgba(0,168,232,.03)); margin-bottom: 1.5rem; cursor: pointer; transition: all .2s; }
+    .ef-package-card:hover, .ef-package-card.selected { border-color: #00a8e8; box-shadow: 0 0 30px rgba(0,168,232,.25); transform: translateY(-2px); }
     .ef-package-card.selected::after { display: none; }
 
+    /* eFootball charge method selector */
+    .ef-method-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem; }
+    .ef-method-card { border: 2px solid var(--border); border-radius: 16px; padding: 1.5rem 1rem; text-align: center; cursor: pointer; transition: all .25s ease; background: var(--bg-card); position: relative; overflow: hidden; }
+    .ef-method-card:hover { border-color: rgba(0,168,232,.6); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,168,232,.15); }
+    .ef-method-card.selected { border-color: #00a8e8; background: rgba(0,168,232,.1); box-shadow: 0 0 24px rgba(0,168,232,.25); }
+    .ef-method-card.selected::after { content: '✓'; position: absolute; top: 8px; left: 8px; background: #00a8e8; color: #fff; width: 20px; height: 20px; border-radius: 50%; font-size: .7rem; display: flex; align-items: center; justify-content: center; font-weight: 800; }
+    .ef-method-icon { font-size: 2.2rem; margin-bottom: .6rem; }
+    .ef-method-name { font-size: .95rem; font-weight: 800; margin-bottom: .3rem; }
+    .ef-method-desc { font-size: .75rem; color: var(--text-secondary); line-height: 1.6; }
+
     /* promo package card highlight */
-    .package-card.promo-pkg {
-      border-color: rgba(249,115,22,.5);
-      background: linear-gradient(135deg, rgba(249,115,22,.08), rgba(244,114,182,.05));
-    }
-    .package-card.promo-pkg:hover, .package-card.promo-pkg.selected {
-      border-color: #f97316;
-      box-shadow: 0 0 20px rgba(249,115,22,.3);
-    }
+    .package-card.promo-pkg { border-color: rgba(249,115,22,.5); background: linear-gradient(135deg, rgba(249,115,22,.08), rgba(244,114,182,.05)); }
+    .package-card.promo-pkg:hover, .package-card.promo-pkg.selected { border-color: #f97316; box-shadow: 0 0 20px rgba(249,115,22,.3); }
+
+    /* flexy-only notice */
+    .flexy-notice { background: rgba(34,197,94,.07); border: 1px solid rgba(34,197,94,.25); border-radius: 10px; padding: .6rem 1rem; font-size: .8rem; color: #86efac; margin-bottom: .75rem; display: flex; align-items: center; gap: .5rem; }
 
     .form-group { margin-bottom: 1.1rem; }
     .form-label { display: block; font-size: .875rem; font-weight: 600; color: var(--text-secondary); margin-bottom: .4rem; }
@@ -233,6 +185,7 @@
     .payment-card { border: 2px solid var(--border); border-radius: 12px; padding: .875rem .5rem; text-align: center; cursor: pointer; transition: all .2s; background: var(--bg-card); }
     .payment-card:hover { border-color: var(--accent-purple); transform: translateY(-2px); }
     .payment-card.selected { border-color: var(--accent-purple); background: rgba(139,92,246,.1); box-shadow: 0 0 16px rgba(139,92,246,.2); }
+    .payment-card.disabled { opacity: .35; cursor: not-allowed; pointer-events: none; }
     .payment-icon { font-size: 1.5rem; margin-bottom: .3rem; }
     .payment-name { font-size: .75rem; font-weight: 700; }
 
@@ -288,20 +241,7 @@
     .warn-box strong { color: #ef4444; }
     .info-box { background: rgba(0,212,255,.05); border: 1px solid rgba(0,212,255,.2); border-radius: 12px; padding: .875rem 1.25rem; margin-bottom: 1rem; font-size: .82rem; color: #7dd3fc; line-height: 1.9; }
 
-    /* Promo highlight inside modal */
-    .promo-modal-box {
-      background: linear-gradient(135deg, rgba(249,115,22,.08), rgba(244,114,182,.05));
-      border: 1px solid rgba(249,115,22,.3);
-      border-radius: 14px;
-      padding: 1rem 1.25rem;
-      margin-bottom: 1.25rem;
-      font-size: .85rem;
-      color: var(--text-secondary);
-      line-height: 1.9;
-      display: flex;
-      align-items: center;
-      gap: .75rem;
-    }
+    .promo-modal-box { background: linear-gradient(135deg, rgba(249,115,22,.08), rgba(244,114,182,.05)); border: 1px solid rgba(249,115,22,.3); border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 1.25rem; font-size: .85rem; color: var(--text-secondary); line-height: 1.9; display: flex; align-items: center; gap: .75rem; }
     .promo-modal-box strong { color: #f97316; }
 
     .float-btns { position: fixed; bottom: 1.5rem; left: 1.5rem; display: flex; flex-direction: column; gap: .75rem; z-index: 90; }
@@ -329,6 +269,7 @@
       .float-btns { bottom: 1rem; left: 1rem; }
       .promo-banner-inner { flex-direction: column; text-align: center; gap: 1rem; }
       .promo-banner { padding: 0 1rem; }
+      .ef-method-grid { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
@@ -354,7 +295,7 @@
     ef:   'https://assetsio.gnwcdn.com/-1631026079629.jpg?width=1200&height=630&fit=crop&enable=upscale&auto=webp'
   };
 
-  const PAYMENT_METHODS = [
+  const ALL_PAYMENT_METHODS = [
     { id: 'flexy',     icon: '📱', name: 'فليكسي' },
     { id: 'baridimob', icon: '🏦', name: 'باريدي موب' },
     { id: 'cash',      icon: '💵', name: 'كاش' },
@@ -364,6 +305,39 @@
   const EF_PACKAGES = [
     { id: 'ef_1dollar', game_id: 'ef', amount: '1 دولار', price: '300 دج', icon: '⚽', popular: false, rate: '1$ = 300 دج' }
   ];
+
+  // eFootball charge methods
+  const EF_CHARGE_METHODS = [
+    {
+      id: 'konami',
+      icon: '🎮',
+      name: 'حساب Konami',
+      desc: 'الشحن مباشرة عبر حسابك على Konami ID'
+    },
+    {
+      id: 'googleplay',
+      icon: '▶️',
+      name: 'Google Play',
+      desc: 'الشحن عبر بطاقة Google Play'
+    }
+  ];
+
+  // Extract numeric price value from price string like "280 دج" or "500 دج"
+  function getPriceValue(priceStr) {
+    const match = String(priceStr).match(/(\d+[\d,\.]*)/);
+    if (!match) return 9999;
+    return parseFloat(match[1].replace(',', ''));
+  }
+
+  // Get available payment methods based on price
+  function getAvailablePayments(priceStr) {
+    const val = getPriceValue(priceStr);
+    if (val < 500) {
+      // Only flexy for packages under 500 DZD
+      return ALL_PAYMENT_METHODS.filter(p => p.id === 'flexy');
+    }
+    return ALL_PAYMENT_METHODS;
+  }
 
   function ls(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch { return def; } }
   function ss(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} }
@@ -407,23 +381,22 @@
     );
   }
 
-  /* ===== PROMO BANNER COMPONENT ===== */
   function PromoBanner() {
     return (
       <div className="promo-banner">
         <div className="promo-banner-inner">
           <div className="promo-icon-wrap">🎁</div>
           <div className="promo-content">
-            <div className="promo-title">🔥 عرض خاص — اشحن 5 واحصل على الـ 6 مجاناً!</div>
+            <div className="promo-title">🔥 عرض خاص — اشحن 9 واحصل على الـ 10 مجاناً!</div>
             <div className="promo-desc">
               صالح لجميع الألعاب: <strong>Free Fire</strong> و <strong>PUBG Mobile</strong> و <strong>eFootball</strong><br />
-              ادفع قيمة 5 شحنات وستحصل على الشحنة السادسة <strong>مجاناً تماماً</strong> 🎉
+              ادفع قيمة 9 شحنات وستحصل على الشحنة العاشرة <strong>مجاناً تماماً</strong> 🎉
             </div>
           </div>
           <div className="promo-badge-wrap">
             <div className="promo-big-badge">
-              اشحن × 5<br />
-              🎁 الـ 6 مجاناً
+              اشحن 9 شحنات<br />
+              🎁 الـ 10 مجاناً
             </div>
           </div>
         </div>
@@ -508,31 +481,65 @@
   function OrderModal({ gameId, packages, onClose, user, notify }) {
     const [sel, setSel] = useState(null);
     const [payMethod, setPayMethod] = useState(null);
+    const [efChargeMethod, setEfChargeMethod] = useState(null); // 'konami' or 'googleplay'
     const [form, setForm] = useState({ playerId: '', email: '', name: '' });
     const [step, setStep] = useState(1);
     const [msg, setMsg] = useState('');
     const [loading, setLoading] = useState(false);
 
-    // For eFootball use static packages
     const displayPackages = gameId === 'ef' ? EF_PACKAGES : packages;
+
+    // Get available payments based on selected package price
+    const availablePayments = React.useMemo(() => {
+      if (!sel) return ALL_PAYMENT_METHODS;
+      const pkg = displayPackages.find(p => p.id === sel);
+      if (!pkg) return ALL_PAYMENT_METHODS;
+      return getAvailablePayments(pkg.price);
+    }, [sel, displayPackages]);
+
+    // Auto-select flexy if it's the only option
+    useEffect(() => {
+      if (availablePayments.length === 1 && availablePayments[0].id === 'flexy') {
+        setPayMethod('flexy');
+      } else if (payMethod && !availablePayments.find(p => p.id === payMethod)) {
+        // Reset payment if current selection is no longer available
+        setPayMethod(null);
+      }
+    }, [availablePayments]);
+
+    const isFlexyOnly = availablePayments.length === 1 && availablePayments[0].id === 'flexy';
 
     function handle(e) { setForm(f => ({ ...f, [e.target.name]: e.target.value })); }
 
     async function confirm() {
-      const idVal = gameId === 'ef' ? form.email : form.playerId;
       if (!sel) { notify('يرجى اختيار باقة', 'error'); return; }
       if (!payMethod) { notify('يرجى اختيار طريقة الدفع', 'error'); return; }
       if (!form.name.trim()) { notify('يرجى إدخال الاسم', 'error'); return; }
-      if (!idVal) { notify(gameId === 'ef' ? 'يرجى إدخال البريد الإلكتروني' : 'يرجى إدخال معرّف اللاعب', 'error'); return; }
+
+      // eFootball validation: need charge method, no player ID needed
+      if (gameId === 'ef') {
+        if (!efChargeMethod) { notify('يرجى اختيار طريقة الشحن', 'error'); return; }
+      } else {
+        if (!form.playerId) { notify('يرجى إدخال معرّف اللاعب', 'error'); return; }
+      }
 
       const pkg = displayPackages.find(p => p.id === sel);
       const date = new Date().toLocaleString('ar-DZ');
-      const payLabel = PAYMENT_METHODS.find(p => p.id === payMethod)?.name || payMethod;
-      const idLine = gameId === 'ef' ? `📧 حساب Konami: ${form.email}` : `🆔 معرّف اللاعب: ${form.playerId}`;
+      const payLabel = ALL_PAYMENT_METHODS.find(p => p.id === payMethod)?.name || payMethod;
+
+      let idLine = '';
+      if (gameId === 'ef') {
+        const chargeMethodLabel = EF_CHARGE_METHODS.find(m => m.id === efChargeMethod)?.name || efChargeMethod;
+        idLine = `🎮 طريقة الشحن: ${chargeMethodLabel}`;
+      } else {
+        idLine = `🆔 معرّف اللاعب: ${form.playerId}`;
+      }
+
       const m = `🎮 *طلب شحن - GameCharge*\n\n🎯 اللعبة: ${GAME_NAMES[gameId]}\n📦 الباقة: ${pkg.amount}\n💰 السعر: ${pkg.price}\n💳 طريقة الدفع: ${payLabel}\n${idLine}\n👤 الاسم: ${form.name}\n📅 التاريخ: ${date}\n\n✅ شكراً لثقتك في GameCharge!`;
 
       setLoading(true);
       const orderId = 'ORD' + Date.now();
+      const playerIdVal = gameId === 'ef' ? (EF_CHARGE_METHODS.find(m => m.id === efChargeMethod)?.name || efChargeMethod) : form.playerId;
       const { error } = await sb.from('orders').insert({
         id: orderId,
         user_id: user.id,
@@ -540,7 +547,7 @@
         game_id: gameId,
         package: pkg.amount,
         price: pkg.price,
-        player_id: idVal,
+        player_id: playerIdVal,
         name: form.name,
         payment_method: payMethod,
         status: 'pending'
@@ -586,17 +593,16 @@
                   💳 <strong>الدفع أولاً قبل الشحن</strong>
                 </div>
 
-                {/* Promo reminder inside modal */}
+                {/* Promo reminder */}
                 <div className="promo-modal-box">
                   <span style={{ fontSize: '1.5rem' }}>🎁</span>
-                  <span>عرض خاص: <strong>اشحن 5 مرات واحصل على الشحنة السادسة مجاناً!</strong> تواصل معنا عبر واتساب أو تيليجرام للاستفادة.</span>
+                  <span>عرض خاص: <strong>اشحن 9 مرات واحصل على الشحنة العاشرة مجاناً!</strong> تواصل معنا عبر واتساب أو تيليجرام للاستفادة.</span>
                 </div>
 
                 {/* Packages */}
                 <div className="section-title" style={{ fontSize: '1rem', marginBottom: '1rem' }}>اختر العرض</div>
 
                 {gameId === 'ef' ? (
-                  /* eFootball: single special package display */
                   <div>
                     {EF_PACKAGES.map(p => (
                       <div key={p.id}
@@ -616,7 +622,7 @@
                         </div>
                       </div>
                     ))}
-                    <div className="info-box" style={{ marginTop: '.75rem' }}>
+                    <div className="info-box">
                       💡 مثال: إذا أردت شحن <strong>5$</strong> فالمبلغ = <strong>1500 دج</strong>. حدّد المبلغ بالدولار عند التواصل.
                     </div>
                   </div>
@@ -635,15 +641,54 @@
 
                 <div className="divider" />
 
-                {/* Payment method */}
-                <div className="section-title" style={{ fontSize: '1rem', marginBottom: '1rem' }}>طريقة الدفع</div>
-                <div className="payment-grid" style={{ marginBottom: '1.25rem' }}>
-                  {PAYMENT_METHODS.map(pm => (
-                    <div key={pm.id} className={`payment-card${payMethod === pm.id ? ' selected' : ''}`} onClick={() => setPayMethod(pm.id)}>
-                      <div className="payment-icon">{pm.icon}</div>
-                      <div className="payment-name">{pm.name}</div>
+                {/* eFootball charge method selector */}
+                {gameId === 'ef' && (
+                  <>
+                    <div className="section-title" style={{ fontSize: '1rem', marginBottom: '1rem' }}>طريقة الشحن</div>
+                    <div className="ef-method-grid" style={{ marginBottom: '1.25rem' }}>
+                      {EF_CHARGE_METHODS.map(m => (
+                        <div
+                          key={m.id}
+                          className={`ef-method-card${efChargeMethod === m.id ? ' selected' : ''}`}
+                          onClick={() => setEfChargeMethod(m.id)}
+                        >
+                          <div className="ef-method-icon">{m.icon}</div>
+                          <div className="ef-method-name">{m.name}</div>
+                          <div className="ef-method-desc">{m.desc}</div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                    <div className="divider" />
+                  </>
+                )}
+
+                {/* Payment method */}
+                <div className="section-title" style={{ fontSize: '1rem', marginBottom: '.5rem' }}>طريقة الدفع</div>
+
+                {/* Flexy-only notice */}
+                {isFlexyOnly && sel && (
+                  <div className="flexy-notice">
+                    <span>📱</span>
+                    <span>هذه الباقة أقل من 500 دج — الدفع بالفليكسي فقط</span>
+                  </div>
+                )}
+
+                <div className="payment-grid" style={{ marginBottom: '1.25rem' }}>
+                  {ALL_PAYMENT_METHODS.map(pm => {
+                    const isAvail = availablePayments.find(p => p.id === pm.id);
+                    return (
+                      <div
+                        key={pm.id}
+                        className={`payment-card${payMethod === pm.id ? ' selected' : ''}${!isAvail ? ' disabled' : ''}`}
+                        onClick={() => isAvail && setPayMethod(pm.id)}
+                        title={!isAvail ? 'غير متاح لهذه الباقة' : ''}
+                      >
+                        <div className="payment-icon">{pm.icon}</div>
+                        <div className="payment-name">{pm.name}</div>
+                        {!isAvail && <div style={{ fontSize: '.6rem', color: 'var(--text-muted)', marginTop: '.2rem' }}>غير متاح</div>}
+                      </div>
+                    );
+                  })}
                 </div>
 
                 <div className="divider" />
@@ -654,12 +699,9 @@
                   <label className="form-label">الاسم الكامل *</label>
                   <input className="form-input" name="name" value={form.name} onChange={handle} placeholder="أدخل اسمك الكريم" />
                 </div>
-                {gameId === 'ef' ? (
-                  <div className="form-group">
-                    <label className="form-label">البريد الإلكتروني لـ Konami *</label>
-                    <input className="form-input" name="email" type="email" value={form.email} onChange={handle} placeholder="example@email.com" style={{ direction: 'ltr', textAlign: 'left' }} />
-                  </div>
-                ) : (
+
+                {/* Only show player ID for non-eFootball games */}
+                {gameId !== 'ef' && (
                   <div className="form-group">
                     <label className="form-label">معرّف اللاعب (Player ID) *</label>
                     <input className="form-input" name="playerId" value={form.playerId} onChange={handle} placeholder="أدخل معرّفك في اللعبة" style={{ direction: 'ltr', textAlign: 'right' }} />
@@ -743,7 +785,7 @@
                       <td style={{ fontWeight: 600 }}>{o.game}</td>
                       <td>{o.package}</td>
                       <td style={{ color: 'var(--accent-cyan)', fontWeight: 700 }}>{o.price}</td>
-                      <td className="table-hide-mob" style={{ fontSize: '.8rem', color: 'var(--text-secondary)' }}>{PAYMENT_METHODS.find(p=>p.id===o.payment_method)?.name || o.payment_method || '-'}</td>
+                      <td className="table-hide-mob" style={{ fontSize: '.8rem', color: 'var(--text-secondary)' }}>{ALL_PAYMENT_METHODS.find(p=>p.id===o.payment_method)?.name || o.payment_method || '-'}</td>
                       <td className="table-hide-mob" style={{ fontSize: '.75rem', color: 'var(--text-muted)' }}>{new Date(o.created_at).toLocaleString('ar-DZ')}</td>
                       <td><span className={`status ${sc(o.status)}`}>{sl(o.status)}</span></td>
                     </tr>
@@ -889,7 +931,7 @@
                   <div className="table-overflow">
                     <table className="table">
                       <thead>
-                        <tr><th>#</th><th>اللعبة</th><th>الباقة</th><th>المعرّف</th><th className="table-hide-mob">الدفع</th><th className="table-hide-mob">الاسم</th><th>الحالة</th><th>إجراء</th></tr>
+                        <tr><th>#</th><th>اللعبة</th><th>الباقة</th><th>المعرّف / الطريقة</th><th className="table-hide-mob">الدفع</th><th className="table-hide-mob">الاسم</th><th>الحالة</th><th>إجراء</th></tr>
                       </thead>
                       <tbody>
                         {orders.map((o, idx) => (
@@ -898,7 +940,7 @@
                             <td style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>{o.game}</td>
                             <td style={{ whiteSpace: 'nowrap' }}>{o.package}</td>
                             <td style={{ fontSize: '.8rem', direction: 'ltr', textAlign: 'right', maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{o.player_id}</td>
-                            <td className="table-hide-mob" style={{ fontSize: '.8rem', color: 'var(--text-secondary)' }}>{PAYMENT_METHODS.find(p=>p.id===o.payment_method)?.name || '-'}</td>
+                            <td className="table-hide-mob" style={{ fontSize: '.8rem', color: 'var(--text-secondary)' }}>{ALL_PAYMENT_METHODS.find(p=>p.id===o.payment_method)?.name || '-'}</td>
                             <td className="table-hide-mob" style={{ color: 'var(--text-secondary)', fontSize: '.85rem' }}>{o.name}</td>
                             <td>
                               <select value={o.status} onChange={e => doUpdateStatus(o.id, e.target.value)}
@@ -926,6 +968,9 @@
               <div className="section-title">إدارة الباقات</div>
               <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '1.5rem', marginBottom: '1.5rem' }}>
                 <div style={{ fontWeight: 700, marginBottom: '1rem', fontSize: '1rem' }}>➕ إضافة باقة جديدة</div>
+                <div style={{ background: 'rgba(34,197,94,.06)', border: '1px solid rgba(34,197,94,.2)', borderRadius: 10, padding: '.75rem 1rem', marginBottom: '1rem', fontSize: '.8rem', color: '#86efac' }}>
+                  📱 <strong>تنبيه:</strong> الباقات التي سعرها أقل من 500 دج ستقبل الدفع بالفليكسي فقط تلقائياً.
+                </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: '.75rem', marginBottom: '1rem' }}>
                   <div>
                     <label className="form-label">اللعبة</label>
@@ -968,20 +1013,24 @@
                     <div style={{ color: 'var(--text-muted)', fontSize: '.875rem', padding: '1rem', background: 'var(--bg-card)', borderRadius: 12, textAlign: 'center' }}>لا توجد باقات - أضف باقة جديدة أعلاه</div>
                   ) : (
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: '.75rem' }}>
-                      {(packages[gid] || []).map(p => (
-                        <div key={p.id} className="offer-row">
-                          <span style={{ fontSize: '1.5rem' }}>{p.icon}</span>
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontWeight: 700, fontSize: '.9rem' }}>{p.amount}</div>
-                            <div style={{ color: 'var(--accent-cyan)', fontSize: '.85rem', fontWeight: 600 }}>{p.price}</div>
-                            {p.popular && <span style={{ fontSize: '.7rem', color: 'var(--accent-orange)' }}>★ الأكثر طلباً</span>}
+                      {(packages[gid] || []).map(p => {
+                        const flexyOnly = getPriceValue(p.price) < 500;
+                        return (
+                          <div key={p.id} className="offer-row">
+                            <span style={{ fontSize: '1.5rem' }}>{p.icon}</span>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontWeight: 700, fontSize: '.9rem' }}>{p.amount}</div>
+                              <div style={{ color: 'var(--accent-cyan)', fontSize: '.85rem', fontWeight: 600 }}>{p.price}</div>
+                              {p.popular && <span style={{ fontSize: '.7rem', color: 'var(--accent-orange)' }}>★ الأكثر طلباً</span>}
+                              {flexyOnly && <span style={{ fontSize: '.68rem', color: '#86efac', display: 'block' }}>📱 فليكسي فقط</span>}
+                            </div>
+                            <div style={{ display: 'flex', gap: '.4rem', flexShrink: 0 }}>
+                              <button className={`btn ${p.popular ? 'btn-success' : 'btn-ghost'}`} style={{ padding: '.25rem .5rem', fontSize: '.7rem' }} onClick={() => doTogglePopular(p.id, p.popular)} title="تمييز">★</button>
+                              <button className="btn btn-danger" style={{ padding: '.25rem .5rem', fontSize: '.7rem' }} onClick={() => doDelPkg(p.id)}>🗑️</button>
+                            </div>
                           </div>
-                          <div style={{ display: 'flex', gap: '.4rem', flexShrink: 0 }}>
-                            <button className={`btn ${p.popular ? 'btn-success' : 'btn-ghost'}`} style={{ padding: '.25rem .5rem', fontSize: '.7rem' }} onClick={() => doTogglePopular(p.id, p.popular)} title="تمييز">★</button>
-                            <button className="btn btn-danger" style={{ padding: '.25rem .5rem', fontSize: '.7rem' }} onClick={() => doDelPkg(p.id)}>🗑️</button>
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -996,6 +1045,7 @@
                 </div>
                 <div style={{ background: 'rgba(0,168,232,.07)', border: '1px solid rgba(0,168,232,.25)', borderRadius: 12, padding: '1.25rem', fontSize: '.875rem', color: 'var(--text-secondary)' }}>
                   ⚽ eFootball — سعر ثابت: <strong style={{ color: '#00a8e8' }}>1$ = 300 دج</strong><br />
+                  🎮 المستخدم يختار طريقة الشحن: <strong style={{ color: '#00a8e8' }}>حساب Konami</strong> أو <strong style={{ color: '#00a8e8' }}>Google Play</strong><br />
                   هذا العرض ثابت ولا يحتاج إلى إدارة من هنا.
                 </div>
               </div>
@@ -1085,38 +1135,31 @@
           </div>
         </div>
 
-        {/* Promo Banner */}
         <PromoBanner />
 
         <div className="section">
           <div className="section-title">اختر لعبتك</div>
           <div className="games-grid">
-            {['ff', 'pubg', 'ef'].map((gid, i) => {
-              return (
-                <div key={gid} className={`game-card ${GAME_CLASSES[gid]}`}
-                  onClick={() => onGame(gid)}
-                  style={{ animationDelay: `${.1*(i+1)}s`, cursor: 'pointer' }}>
-                  <div className="game-card-img">
-                    <img src={GAME_IMAGES[gid]} alt={GAME_NAMES[gid]}
-                      onError={e => { e.target.style.display='none'; }}
-                    />
-                    <div className="game-card-overlay" />
-                  </div>
-                  <div className="game-card-body">
-                    <div className="game-card-name">{GAME_NAMES[gid]}</div>
-                    <div className="game-card-desc">{GAME_DESCS[gid]}</div>
-                    {gid === 'ef' && (
-                      <div style={{ marginBottom: '.75rem', display: 'inline-flex', alignItems: 'center', gap: '.4rem', background: 'rgba(0,168,232,.12)', border: '1px solid rgba(0,168,232,.3)', borderRadius: 8, padding: '.25rem .75rem', fontSize: '.8rem', color: '#00a8e8', fontWeight: 700 }}>
-                        💱 1$ = 300 دج
-                      </div>
-                    )}
-                    <button className={`game-card-btn ${GAME_BTN[gid]}`}>
-                      اشحن الآن ⚡
-                    </button>
-                  </div>
+            {['ff', 'pubg', 'ef'].map((gid, i) => (
+              <div key={gid} className={`game-card ${GAME_CLASSES[gid]}`}
+                onClick={() => onGame(gid)}
+                style={{ animationDelay: `${.1*(i+1)}s`, cursor: 'pointer' }}>
+                <div className="game-card-img">
+                  <img src={GAME_IMAGES[gid]} alt={GAME_NAMES[gid]} onError={e => { e.target.style.display='none'; }} />
+                  <div className="game-card-overlay" />
                 </div>
-              );
-            })}
+                <div className="game-card-body">
+                  <div className="game-card-name">{GAME_NAMES[gid]}</div>
+                  <div className="game-card-desc">{GAME_DESCS[gid]}</div>
+                  {gid === 'ef' && (
+                    <div style={{ marginBottom: '.75rem', display: 'inline-flex', alignItems: 'center', gap: '.4rem', background: 'rgba(0,168,232,.12)', border: '1px solid rgba(0,168,232,.3)', borderRadius: 8, padding: '.25rem .75rem', fontSize: '.8rem', color: '#00a8e8', fontWeight: 700 }}>
+                      💱 1$ = 300 دج
+                    </div>
+                  )}
+                  <button className={`game-card-btn ${GAME_BTN[gid]}`}>اشحن الآن ⚡</button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
         <div className="section" style={{ paddingTop: 0 }}>
@@ -1124,7 +1167,7 @@
             {[
               { icon: '⚡', title: 'شحن سريع', desc: 'معالجة طلبك خلال 24 إلى 48 ساعة' },
               { icon: '🔒', title: 'أمان تام', desc: 'معاملاتك مشفرة ومحمية بالكامل' },
-              { icon: '🎁', title: 'عرض 5+1 مجاناً', desc: 'اشحن 5 مرات واحصل على الـ 6 مجاناً!' },
+              { icon: '🎁', title: 'عرض 9+1 مجاناً', desc: 'اشحن 9 مرات واحصل على الـ 10 مجاناً!' },
               { icon: '📱', title: '3 طرق دفع', desc: 'فليكسي، باريدي موب، أو كاش' },
             ].map((f, i) => (
               <div key={i} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '1.5rem', animation: `fadeIn .5s ${.1*i}s ease both` }}>
