@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GameCharge | منصة شحن الألعاب</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23060912'/><text y='46' x='6' font-size='44'>🎮</text></svg>">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Exo+2:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #060912;
+      --bg-card: #0d1120;
+      --bg-card2: #111827;
+      --bg-modal: #0a0f1e;
+      --accent-cyan: #00d4ff;
+      --accent-purple: #8b5cf6;
+      --accent-pink: #f472b6;
+      --accent-orange: #f97316;
+      --accent-green: #22c55e;
+      --text-primary: #f0f4ff;
+      --text-secondary: #8892a4;
+      --text-muted: #4a5568;
+      --border: #1e2d4a;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Cairo', sans-serif; background: var(--bg-base); color: var(--text-primary); direction: rtl; min-height: 100vh; overflow-x: hidden; }
+    body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 80% 50% at 20% 10%, rgba(139,92,246,.08) 0%, transparent 60%), radial-gradient(ellipse 60% 40% at 80% 80%, rgba(0,212,255,.06) 0%, transparent 60%); pointer-events: none; z-index: 0; }
+    #root { position: relative; z-index: 1; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-base); }
+    ::-webkit-scrollbar-thumb { background: var(--accent-purple); border-radius: 3px; }
+
+    @keyframes fadeIn { from { opacity:0; transform:translateY(20px) } to { opacity:1; transform:translateY(0) } }
+    @keyframes fadeInScale { from { opacity:0; transform:scale(.85) } to { opacity:1; transform:scale(1) } }
+    @keyframes slideDown { from { opacity:0; transform:translateY(-30px) } to { opacity:1; transform:translateY(0) } }
+    @keyframes shimmer { 0% { background-position:-200% center } 100% { background-position:200% center } }
+    @keyframes float { 0%,100% { transform:translateY(0) } 50% { transform:translateY(-8px) } }
+    @keyframes spin { from { transform:rotate(0) } to { transform:rotate(360deg) } }
+    @keyframes popIn { from { opacity:0; transform:scale(.5) rotate(-10deg) } to { opacity:1; transform:scale(1) rotate(0) } }
+    @keyframes countDown { from { stroke-dashoffset:0 } to { stroke-dashoffset:283 } }
+    @keyframes neonFlicker { 0%,100% { opacity:1 } 92% { opacity:1 } 93% { opacity:.6 } 95% { opacity:1 } 97% { opacity:.7 } 98% { opacity:1 } }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+    @keyframes promoGlow { 0%,100%{box-shadow:0 0 20px rgba(249,115,22,.3),0 0 40px rgba(244,114,182,.15)} 50%{box-shadow:0 0 40px rgba(249,115,22,.5),0 0 80px rgba(244,114,182,.3)} }
+    @keyframes starSpin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+
+    .navbar { position: fixed; top: 0; width: 100%; z-index: 100; background: rgba(6,9,18,.92); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 0 2rem; height: 64px; display: flex; align-items: center; justify-content: space-between; animation: slideDown .5s ease; }
+    .navbar-logo { font-family: 'Exo 2', sans-serif; font-size: 1.4rem; font-weight: 900; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: neonFlicker 4s infinite; display: flex; align-items: center; gap: .4rem; }
+    .navbar-logo span { background: linear-gradient(135deg, var(--accent-pink), var(--accent-orange)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .navbar-actions { display: flex; gap: .75rem; align-items: center; }
+
+    .btn { padding: .5rem 1.25rem; border-radius: 8px; border: none; cursor: pointer; font-family: 'Cairo', sans-serif; font-size: .875rem; font-weight: 600; transition: all .2s ease; display: inline-flex; align-items: center; gap: .4rem; }
+    .btn-primary { background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); color: #fff; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,212,255,.4); }
+    .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); }
+    .btn-ghost:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+    .btn-danger { background: rgba(239,68,68,.15); border: 1px solid rgba(239,68,68,.3); color: #ef4444; }
+    .btn-danger:hover { background: rgba(239,68,68,.25); }
+    .btn-success { background: rgba(34,197,94,.15); border: 1px solid rgba(34,197,94,.3); color: #22c55e; }
+    .btn-success:hover { background: rgba(34,197,94,.25); }
+    .btn-lg { padding: .875rem 2rem; font-size: 1rem; border-radius: 12px; }
+    .btn-full { width: 100%; justify-content: center; }
+    .btn-wa { background: linear-gradient(135deg, #25d366, #128c7e); color: #fff; }
+    .btn-wa:hover { transform: translateY(-2px); filter: brightness(1.1); }
+    .btn-tg { background: linear-gradient(135deg, #0088cc, #005e8a); color: #fff; }
+    .btn-tg:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+    .btn-google { background: #fff; color: #1f1f1f; border: 1px solid #e0e0e0; font-weight: 600; font-size: .9rem; padding: .75rem 1.5rem; border-radius: 10px; width: 100%; justify-content: center; gap: .6rem; transition: all .2s; }
+    .btn-google:hover { background: #f5f5f5; box-shadow: 0 4px 16px rgba(0,0,0,.2); transform: translateY(-1px); }
+
+    .hero { padding: 120px 2rem 80px; text-align: center; position: relative; overflow: hidden; }
+    .hero-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 70% 60% at 50% 30%, rgba(139,92,246,.12) 0%, transparent 70%); pointer-events: none; }
+    .hero-title { font-size: clamp(2rem,6vw,4rem); font-weight: 900; line-height: 1.1; margin-bottom: 1rem; animation: fadeIn .8s ease; }
+    .hero-title .gradient-text { background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple), var(--accent-pink)); background-size: 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shimmer 3s linear infinite; }
+    .hero-sub { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 2rem; animation: fadeIn .8s .2s ease both; }
+    .hero-badges { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; animation: fadeIn .8s .4s ease both; }
+
+    .badge { padding: .4rem 1rem; border-radius: 999px; font-size: .8rem; font-weight: 600; border: 1px solid; display: flex; align-items: center; gap: .4rem; }
+    .badge-cyan { background: rgba(0,212,255,.1); border-color: rgba(0,212,255,.3); color: var(--accent-cyan); }
+    .badge-purple { background: rgba(139,92,246,.1); border-color: rgba(139,92,246,.3); color: var(--accent-purple); }
+    .badge-pink { background: rgba(244,114,182,.1); border-color: rgba(244,114,182,.3); color: var(--accent-pink); }
+    .badge-orange { background: rgba(249,115,22,.1); border-color: rgba(249,115,22,.3); color: var(--accent-orange); }
+
+    .section { padding: 4rem 2rem; max-width: 1200px; margin: 0 auto; }
+    .section-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 1.5rem; display: flex; align-items: center; gap: .75rem; }
+    .section-title::before { content: ''; width: 4px; height: 1.5rem; background: linear-gradient(to bottom, var(--accent-cyan), var(--accent-purple)); border-radius: 2px; display: block; }
+    .games-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+
+    .game-card { border-radius: 20px; overflow: hidden; position: relative; cursor: pointer; transition: transform .3s ease, box-shadow .3s ease; animation: fadeIn .6s ease both; background: var(--bg-card); border: 1px solid var(--border); }
+    .game-card:hover { transform: translateY(-8px); }
+    .game-card-img { height: 200px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    .game-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s ease; }
+    .game-card:hover .game-card-img img { transform: scale(1.05); }
+    .game-card-overlay { position: absolute; inset: 0; background: linear-gradient(to top, var(--bg-card) 0%, transparent 60%); z-index: 1; }
+    .game-card-body { padding: 1.25rem; }
+    .game-card-name { font-size: 1.2rem; font-weight: 800; margin-bottom: .4rem; }
+    .game-card-desc { font-size: .85rem; color: var(--text-secondary); margin-bottom: 1rem; }
+    .game-card-btn { width: 100%; padding: .75rem; border-radius: 10px; border: none; font-family: 'Cairo', sans-serif; font-size: .95rem; font-weight: 700; cursor: pointer; transition: all .2s ease; position: relative; overflow: hidden; }
+    .game-card-btn::before { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,.1); transform: translateX(-100%); transition: transform .3s ease; }
+    .game-card-btn:hover::before { transform: translateX(0); }
+
+    .ff-card { background: linear-gradient(135deg, rgba(255,107,0,.1), rgba(255,60,0,.05)); border-color: rgba(255,107,0,.3); }
+    .ff-card:hover { box-shadow: 0 20px 60px rgba(255,107,0,.2); border-color: rgba(255,107,0,.6); }
+    .ff-btn { background: linear-gradient(135deg, #ff6b00, #ff3c00); color: #fff; }
+    .pubg-card { background: linear-gradient(135deg, rgba(245,197,24,.08), rgba(245,197,24,.03)); border-color: rgba(245,197,24,.3); }
+    .pubg-card:hover { box-shadow: 0 20px 60px rgba(245,197,24,.15); border-color: rgba(245,197,24,.6); }
+    .pubg-btn { background: linear-gradient(135deg, #f5c518, #e0a800); color: #000; }
+    .ef-card { background: linear-gradient(135deg, rgba(0,168,232,.1), rgba(0,168,232,.03)); border-color: rgba(0,168,232,.3); }
+    .ef-btn { background: linear-gradient(135deg, #00a8e8, #0077b6); color: #fff; }
+
+    /* ===== PROMO BANNER ===== */
+    .promo-banner {
+      max-width: 1200px;
+      margin: 0 auto 0;
+      padding: 0 2rem;
+    }
+    .promo-banner-inner {
+      background: linear-gradient(135deg, rgba(249,115,22,.12), rgba(244,114,182,.08), rgba(139,92,246,.1));
+      border: 1px solid rgba(249,115,22,.4);
+      border-radius: 20px;
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      animation: promoGlow 3s ease infinite, fadeIn .8s .6s ease both;
+      position: relative;
+      overflow: hidden;
+    }
+    .promo-banner-inner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(45deg, transparent, transparent 30px, rgba(249,115,22,.03) 30px, rgba(249,115,22,.03) 31px);
+      pointer-events: none;
+    }
+    .promo-icon-wrap {
+      font-size: 2.5rem;
+      flex-shrink: 0;
+      animation: float 2.5s ease infinite;
+    }
+    .promo-content { flex: 1; min-width: 0; }
+    .promo-title {
+      font-size: 1.15rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #f97316, #f472b6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: .3rem;
+    }
+    .promo-desc { font-size: .875rem; color: var(--text-secondary); line-height: 1.7; }
+    .promo-desc strong { color: var(--accent-cyan); }
+    .promo-badge-wrap { flex-shrink: 0; text-align: center; }
+    .promo-big-badge {
+      background: linear-gradient(135deg, #f97316, #f472b6);
+      color: #fff;
+      font-size: .75rem;
+      font-weight: 900;
+      padding: .5rem 1rem;
+      border-radius: 12px;
+      line-height: 1.5;
+      white-space: nowrap;
+      box-shadow: 0 4px 20px rgba(249,115,22,.4);
+    }
+
+    .popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.85); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem; animation: fadeIn .3s ease; }
+    .popup-box { background: var(--bg-modal); border: 1px solid var(--border); border-radius: 24px; padding: 2.5rem; max-width: 440px; width: 100%; text-align: center; position: relative; animation: fadeInScale .4s cubic-bezier(.34,1.56,.64,1); box-shadow: 0 0 80px rgba(139,92,246,.2), 0 0 120px rgba(0,212,255,.1); }
+    .popup-box::before { content: ''; position: absolute; inset: -1px; border-radius: 24px; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple), var(--accent-pink)); z-index: -1; opacity: .5; }
+    .popup-close { position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,.05); border: 1px solid var(--border); border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); font-size: 1rem; transition: all .2s; }
+    .popup-close:hover { background: rgba(239,68,68,.15); border-color: #ef4444; color: #ef4444; }
+    .popup-timer-wrap { position: absolute; top: 1rem; left: 1rem; }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.8); backdrop-filter: blur(10px); z-index: 200; display: flex; align-items: flex-start; justify-content: center; padding: 1rem; overflow-y: auto; animation: fadeIn .2s ease; }
+    .modal-box { background: var(--bg-modal); border: 1px solid var(--border); border-radius: 24px; width: 100%; max-width: 700px; margin: auto; animation: fadeInScale .3s ease; overflow: hidden; }
+    .modal-header { padding: 1.5rem 1.75rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .modal-title { font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: .5rem; }
+    .modal-body { padding: 1.75rem; }
+    .modal-close { background: none; border: 1px solid var(--border); color: var(--text-secondary); width: 36px; height: 36px; border-radius: 8px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+    .modal-close:hover { border-color: #ef4444; color: #ef4444; }
+
+    .auth-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.85); backdrop-filter: blur(10px); z-index: 300; display: flex; align-items: center; justify-content: center; padding: 1rem; animation: fadeIn .2s ease; }
+    .auth-box { background: var(--bg-modal); border: 1px solid var(--border); border-radius: 24px; padding: 2.5rem; max-width: 400px; width: 100%; animation: fadeInScale .3s ease; }
+
+    .packages-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: .75rem; margin-bottom: 1.5rem; }
+    .package-card { border: 2px solid var(--border); border-radius: 14px; padding: .875rem .625rem; text-align: center; cursor: pointer; transition: all .2s ease; background: var(--bg-card); position: relative; overflow: hidden; }
+    .package-card:hover { border-color: var(--accent-cyan); transform: translateY(-3px); }
+    .package-card.selected { border-color: var(--accent-cyan); background: rgba(0,212,255,.08); box-shadow: 0 0 20px rgba(0,212,255,.2); }
+    .package-card.selected::after { content: '✓'; position: absolute; top: 5px; left: 5px; background: var(--accent-cyan); color: #000; width: 16px; height: 16px; border-radius: 50%; font-size: .65rem; display: flex; align-items: center; justify-content: center; font-weight: 800; }
+    .package-icon { font-size: 1.4rem; margin-bottom: .3rem; }
+    .package-amount { font-size: .9rem; font-weight: 800; margin-bottom: .25rem; }
+    .package-price { font-size: .8rem; font-weight: 700; padding: .15rem .5rem; border-radius: 999px; display: inline-block; }
+    .package-popular { position: absolute; top: -1px; right: -1px; background: linear-gradient(135deg, var(--accent-orange), var(--accent-pink)); color: #fff; font-size: .55rem; font-weight: 700; padding: .15rem .4rem; border-radius: 0 12px 0 8px; }
+
+    /* eFootball special package */
+    .ef-package-card {
+      border: 2px solid rgba(0,168,232,.4);
+      border-radius: 16px;
+      padding: 1.5rem;
+      text-align: center;
+      background: linear-gradient(135deg, rgba(0,168,232,.08), rgba(0,168,232,.03));
+      margin-bottom: 1.5rem;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .ef-package-card:hover, .ef-package-card.selected {
+      border-color: #00a8e8;
+      box-shadow: 0 0 30px rgba(0,168,232,.25);
+      transform: translateY(-2px);
+    }
+    .ef-package-card.selected::after { display: none; }
+
+    /* promo package card highlight */
+    .package-card.promo-pkg {
+      border-color: rgba(249,115,22,.5);
+      background: linear-gradient(135deg, rgba(249,115,22,.08), rgba(244,114,182,.05));
+    }
+    .package-card.promo-pkg:hover, .package-card.promo-pkg.selected {
+      border-color: #f97316;
+      box-shadow: 0 0 20px rgba(249,115,22,.3);
+    }
+
+    .form-group { margin-bottom: 1.1rem; }
+    .form-label { display: block; font-size: .875rem; font-weight: 600; color: var(--text-secondary); margin-bottom: .4rem; }
+    .form-input { width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: .75rem 1rem; color: var(--text-primary); font-family: 'Cairo', sans-serif; font-size: .95rem; transition: border-color .2s; outline: none; }
+    .form-input:focus { border-color: var(--accent-cyan); box-shadow: 0 0 0 3px rgba(0,212,255,.1); }
+    .form-input::placeholder { color: var(--text-muted); }
+    select.form-input { appearance: none; cursor: pointer; }
+
+    .payment-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; margin-bottom: 1rem; }
+    .payment-card { border: 2px solid var(--border); border-radius: 12px; padding: .875rem .5rem; text-align: center; cursor: pointer; transition: all .2s; background: var(--bg-card); }
+    .payment-card:hover { border-color: var(--accent-purple); transform: translateY(-2px); }
+    .payment-card.selected { border-color: var(--accent-purple); background: rgba(139,92,246,.1); box-shadow: 0 0 16px rgba(139,92,246,.2); }
+    .payment-icon { font-size: 1.5rem; margin-bottom: .3rem; }
+    .payment-name { font-size: .75rem; font-weight: 700; }
+
+    .dashboard { padding: 80px 2rem 4rem; max-width: 1200px; margin: 0 auto; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 1.25rem; animation: fadeIn .5s ease both; }
+
+    .orders-table { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+    .orders-table-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); font-weight: 700; }
+    .table { width: 100%; border-collapse: collapse; }
+    .table th { padding: .75rem 1rem; text-align: right; font-size: .8rem; color: var(--text-secondary); border-bottom: 1px solid var(--border); white-space: nowrap; }
+    .table td { padding: .75rem 1rem; font-size: .875rem; border-bottom: 1px solid rgba(30,45,74,.5); vertical-align: middle; }
+    .table tr:last-child td { border-bottom: none; }
+    .table tr:hover td { background: rgba(255,255,255,.02); }
+    .table-overflow { overflow-x: auto; }
+
+    .status { padding: .25rem .75rem; border-radius: 999px; font-size: .75rem; font-weight: 700; display: inline-flex; align-items: center; gap: .3rem; white-space: nowrap; }
+    .status-pending { background: rgba(245,197,24,.15); color: #f5c518; border: 1px solid rgba(245,197,24,.3); }
+    .status-done { background: rgba(34,197,94,.15); color: #22c55e; border: 1px solid rgba(34,197,94,.3); }
+    .status-rejected { background: rgba(239,68,68,.15); color: #ef4444; border: 1px solid rgba(239,68,68,.3); }
+
+    .admin-sidebar { width: 240px; background: var(--bg-card); border-left: 1px solid var(--border); padding: 80px 1rem 2rem; position: fixed; right: 0; top: 0; bottom: 0; overflow-y: auto; z-index: 50; }
+    .admin-main { margin-right: 240px; padding: 80px 2rem 4rem; flex: 1; min-width: 0; }
+    .admin-nav-item { display: flex; align-items: center; gap: .75rem; padding: .75rem 1rem; border-radius: 10px; cursor: pointer; color: var(--text-secondary); font-size: .9rem; font-weight: 600; transition: all .2s; margin-bottom: .25rem; border: 1px solid transparent; }
+    .admin-nav-item:hover, .admin-nav-item.active { background: rgba(0,212,255,.08); border-color: rgba(0,212,255,.2); color: var(--accent-cyan); }
+
+    .notif-wrap { position: fixed; top: 76px; left: 1rem; z-index: 9999; display: flex; flex-direction: column; gap: .5rem; }
+    .notif { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 12px; padding: .875rem 1.25rem; min-width: 260px; max-width: 340px; display: flex; align-items: center; gap: .75rem; animation: slideDown .3s ease; box-shadow: 0 8px 32px rgba(0,0,0,.4); cursor: pointer; }
+    .notif-success { border-color: rgba(34,197,94,.4); }
+    .notif-error { border-color: rgba(239,68,68,.4); }
+    .notif-info { border-color: rgba(0,212,255,.4); }
+
+    .loader { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.2); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; }
+    .divider { height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 1.25rem 0; }
+    .footer { border-top: 1px solid var(--border); padding: 2rem; text-align: center; color: var(--text-muted); font-size: .85rem; }
+
+    .user-menu-wrap { position: relative; }
+    .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: .875rem; cursor: pointer; border: 2px solid transparent; transition: all .2s; overflow: hidden; }
+    .user-avatar:hover { border-color: var(--accent-cyan); }
+    .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .user-dropdown { position: absolute; top: calc(100% + 8px); left: 0; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 12px; min-width: 180px; padding: .5rem; animation: fadeIn .2s ease; box-shadow: 0 12px 40px rgba(0,0,0,.4); z-index: 999; }
+    .user-dd-item { padding: .625rem .875rem; border-radius: 8px; cursor: pointer; font-size: .875rem; display: flex; align-items: center; gap: .5rem; transition: background .2s; color: var(--text-secondary); }
+    .user-dd-item:hover { background: rgba(255,255,255,.05); color: var(--text-primary); }
+    .user-dd-item.danger { color: #ef4444; }
+
+    .empty-state { text-align: center; padding: 3rem; color: var(--text-muted); }
+    .loading-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 1rem; }
+
+    .offer-row { display: flex; align-items: center; padding: .875rem 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: .625rem; gap: .875rem; }
+    .offer-row:hover { border-color: var(--accent-cyan); }
+
+    .warn-box { background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.3); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1rem; font-size: .82rem; color: #fca5a5; line-height: 1.9; }
+    .warn-box strong { color: #ef4444; }
+    .info-box { background: rgba(0,212,255,.05); border: 1px solid rgba(0,212,255,.2); border-radius: 12px; padding: .875rem 1.25rem; margin-bottom: 1rem; font-size: .82rem; color: #7dd3fc; line-height: 1.9; }
+
+    /* Promo highlight inside modal */
+    .promo-modal-box {
+      background: linear-gradient(135deg, rgba(249,115,22,.08), rgba(244,114,182,.05));
+      border: 1px solid rgba(249,115,22,.3);
+      border-radius: 14px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+      font-size: .85rem;
+      color: var(--text-secondary);
+      line-height: 1.9;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+    .promo-modal-box strong { color: #f97316; }
+
+    .float-btns { position: fixed; bottom: 1.5rem; left: 1.5rem; display: flex; flex-direction: column; gap: .75rem; z-index: 90; }
+    .float-btn { width: 52px; height: 52px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; transition: all .2s; box-shadow: 0 4px 20px rgba(0,0,0,.4); }
+    .float-btn-wa { background: linear-gradient(135deg, #25d366, #128c7e); }
+    .float-btn-tg { background: linear-gradient(135deg, #0088cc, #005e8a); }
+    .float-btn:hover { transform: scale(1.1) translateY(-2px); }
+
+    .coming-soon-badge { position: absolute; top: 12px; right: 12px; background: linear-gradient(135deg, var(--accent-orange), var(--accent-pink)); color: #fff; font-size: .7rem; font-weight: 800; padding: .25rem .75rem; border-radius: 999px; z-index: 3; animation: pulse 2s ease infinite; }
+
+    @media(max-width:768px) {
+      .admin-sidebar { display: none; }
+      .admin-main { margin-right: 0; padding: 80px 1rem 2rem; }
+      .mob-tabs { display: flex; overflow-x: auto; gap: .5rem; padding: .5rem 0 1rem; margin-bottom: 1rem; scrollbar-width: none; }
+      .mob-tabs::-webkit-scrollbar { display: none; }
+      .mob-tab { white-space: nowrap; padding: .5rem 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 999px; cursor: pointer; font-family: 'Cairo', sans-serif; font-size: .8rem; font-weight: 600; color: var(--text-secondary); transition: all .2s; }
+      .mob-tab.active { background: rgba(0,212,255,.1); border-color: var(--accent-cyan); color: var(--accent-cyan); }
+      .packages-grid { grid-template-columns: repeat(3, 1fr); }
+      .games-grid { grid-template-columns: 1fr; }
+      .navbar { padding: 0 1rem; }
+      .hero { padding: 100px 1rem 60px; }
+      .section { padding: 2rem 1rem; }
+      .payment-grid { grid-template-columns: repeat(3, 1fr); }
+      .table-hide-mob { display: none; }
+      .float-btns { bottom: 1rem; left: 1rem; }
+      .promo-banner-inner { flex-direction: column; text-align: center; gap: 1rem; }
+      .promo-banner { padding: 0 1rem; }
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+  const { useState, useEffect, useCallback, useRef } = React;
+
+  const SUPABASE_URL = "https://zxqvdpmnvjegkgrkhexg.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4cXZkcG1udmplZ2tncmtoZXhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MzE1NzgsImV4cCI6MjA5NjMwNzU3OH0.mHOzZi34hdo-5K3L6ApDTsBOHkoUELA1nb8jhD50r0U";
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const GAME_ICONS   = { ff: '🔥', pubg: '🎯', ef: '⚽' };
+  const GAME_COLORS  = { ff: '#ff6b00', pubg: '#f5c518', ef: '#00a8e8' };
+  const GAME_NAMES   = { ff: 'Free Fire', pubg: 'PUBG Mobile', ef: 'eFootball' };
+  const GAME_DESCS   = { ff: 'ساحة معركة لا هوادة فيها', pubg: 'أكبر منافسة بقاء على الإطلاق', ef: 'شحن نقاط eFootball بسهولة' };
+  const GAME_CLASSES = { ff: 'ff-card', pubg: 'pubg-card', ef: 'ef-card' };
+  const GAME_BTN     = { ff: 'ff-btn', pubg: 'pubg-btn', ef: 'ef-btn' };
+
+  const GAME_IMAGES  = {
+    ff:   'https://i.ytimg.com/vi/2sldimQNc84/maxresdefault.jpg',
+    pubg: 'https://vkplay.ru/hotbox/content_files/Stories/2023/02/09/77643b589a0c4e65b5a0b49bdf6f3b7f.jpg',
+    ef:   'https://assetsio.gnwcdn.com/-1631026079629.jpg?width=1200&height=630&fit=crop&enable=upscale&auto=webp'
+  };
+
+  const PAYMENT_METHODS = [
+    { id: 'flexy',     icon: '📱', name: 'فليكسي' },
+    { id: 'baridimob', icon: '🏦', name: 'باريدي موب' },
+    { id: 'cash',      icon: '💵', name: 'كاش' },
+  ];
+
+  // Static eFootball package (1$ = 300 DA)
+  const EF_PACKAGES = [
+    { id: 'ef_1dollar', game_id: 'ef', amount: '1 دولار', price: '300 دج', icon: '⚽', popular: false, rate: '1$ = 300 دج' }
+  ];
+
+  function ls(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch { return def; } }
+  function ss(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} }
+
+  function useNotify() {
+    const [list, setList] = useState([]);
+    const add = useCallback((msg, type = 'info') => {
+      const id = Date.now();
+      setList(p => [...p, { id, msg, type }]);
+      setTimeout(() => setList(p => p.filter(n => n.id !== id)), 3500);
+    }, []);
+    const rm = useCallback(id => setList(p => p.filter(n => n.id !== id)), []);
+    return [list, add, rm];
+  }
+
+  function Notifs({ list, rm }) {
+    return (
+      <div className="notif-wrap">
+        {list.map(n => (
+          <div key={n.id} className={`notif notif-${n.type}`} onClick={() => rm(n.id)}>
+            <span>{n.type === 'success' ? '✅' : n.type === 'error' ? '❌' : 'ℹ️'}</span>
+            <span style={{ fontSize: '.875rem' }}>{n.msg}</span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  function FloatSupportBtns() {
+    return (
+      <div className="float-btns">
+        <button className="float-btn float-btn-wa" title="الدعم الفني عبر واتساب"
+          onClick={() => window.open('https://wa.me/213656635272?text=مرحباً، أحتاج مساعدة', '_blank')}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.858L.053 23.447c-.072.27.184.527.454.453l5.635-1.48A11.928 11.928 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.8 9.8 0 01-5.045-1.395l-.361-.215-3.745.983.999-3.645-.236-.374A9.786 9.786 0 012.182 12C2.182 6.579 6.579 2.182 12 2.182S21.818 6.579 21.818 12 17.421 21.818 12 21.818z"/></svg>
+        </button>
+        <button className="float-btn float-btn-tg" title="الدعم الفني عبر تيليجرام"
+          onClick={() => window.open('https://t.me/BrahimDehanidz', '_blank')}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+        </button>
+      </div>
+    );
+  }
+
+  /* ===== PROMO BANNER COMPONENT ===== */
+  function PromoBanner() {
+    return (
+      <div className="promo-banner">
+        <div className="promo-banner-inner">
+          <div className="promo-icon-wrap">🎁</div>
+          <div className="promo-content">
+            <div className="promo-title">🔥 عرض خاص — اشحن 5 واحصل على الـ 6 مجاناً!</div>
+            <div className="promo-desc">
+              صالح لجميع الألعاب: <strong>Free Fire</strong> و <strong>PUBG Mobile</strong> و <strong>eFootball</strong><br />
+              ادفع قيمة 5 شحنات وستحصل على الشحنة السادسة <strong>مجاناً تماماً</strong> 🎉
+            </div>
+          </div>
+          <div className="promo-badge-wrap">
+            <div className="promo-big-badge">
+              اشحن × 5<br />
+              🎁 الـ 6 مجاناً
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function WelcomePopup({ onClose }) {
+    const [secs, setSecs] = useState(5);
+    useEffect(() => {
+      const t = setInterval(() => setSecs(s => {
+        if (s <= 1) { clearInterval(t); onClose(); return 0; }
+        return s - 1;
+      }), 1000);
+      return () => clearInterval(t);
+    }, []);
+    return (
+      <div className="popup-overlay">
+        <div className="popup-box">
+          <button className="popup-close" onClick={onClose}>✕</button>
+          <div className="popup-timer-wrap">
+            <svg width="38" height="38" viewBox="0 0 100 100" style={{ transform: 'rotate(-90deg)' }}>
+              <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,.05)" strokeWidth="8" />
+              <circle cx="50" cy="50" r="45" fill="none" stroke="var(--accent-cyan)" strokeWidth="8" strokeLinecap="round"
+                style={{ strokeDasharray: 283, strokeDashoffset: 0, animation: 'countDown 5s linear forwards' }} />
+            </svg>
+            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', fontSize: '.7rem', fontWeight: 700, color: 'var(--accent-cyan)' }}>{secs}</div>
+          </div>
+          <div style={{ fontSize: '2.5rem', marginBottom: '.5rem' }}>🎮</div>
+          <h2 style={{ fontSize: '1.4rem', fontWeight: 800, marginBottom: '.625rem' }}>مرحباً بك في GameCharge!</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '.9rem', lineHeight: 1.8, marginBottom: '1.25rem' }}>
+            منصتك الأولى لشحن ألعابك المفضلة بأسعار تنافسية وسرعة فائقة.<br />
+            نوفر خدمة شحن موثوقة لـ Free Fire و PUBG Mobile و eFootball.
+          </p>
+          <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '1.25rem' }}>
+            <span className="badge badge-cyan">⚡ شحن فوري</span>
+            <span className="badge badge-purple">🔒 آمن 100%</span>
+            <span className="badge badge-pink">💬 دعم 24/7</span>
+            <span className="badge badge-orange">🎁 5+1 مجاناً</span>
+          </div>
+          <button className="btn btn-primary btn-full btn-lg" onClick={onClose}>ابدأ الشحن الآن 🚀</button>
+        </div>
+      </div>
+    );
+  }
+
+  function AuthModal({ onClose, notify }) {
+    const [loading, setLoading] = useState(false);
+    async function handleGoogle() {
+      setLoading(true);
+      const { error } = await sb.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.origin }
+      });
+      if (error) { notify('فشل تسجيل الدخول بـ Google: ' + error.message, 'error'); setLoading(false); }
+    }
+    return (
+      <div className="auth-overlay" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+        <div className="auth-box">
+          <div style={{ textAlign: 'center', fontSize: '2.5rem', marginBottom: '.5rem' }}>🎮</div>
+          <h2 style={{ fontSize: '1.4rem', fontWeight: 800, textAlign: 'center', marginBottom: '.4rem' }}>تسجيل الدخول</h2>
+          <p style={{ color: 'var(--text-secondary)', textAlign: 'center', fontSize: '.875rem', marginBottom: '1.75rem' }}>
+            سجّل دخولك لبدء الشحن بسهولة وتتبع طلباتك
+          </p>
+          <button className="btn btn-google" onClick={handleGoogle} disabled={loading}>
+            {loading ? <span className="loader" style={{ borderTopColor: '#4285f4' }} /> : (
+              <svg width="18" height="18" viewBox="0 0 18 18">
+                <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/>
+                <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/>
+                <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/>
+                <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+              </svg>
+            )}
+            المتابعة عبر Google
+          </button>
+          <button className="btn btn-ghost btn-full" style={{ marginTop: '.75rem' }} onClick={onClose}>إلغاء</button>
+        </div>
+      </div>
+    );
+  }
+
+  function OrderModal({ gameId, packages, onClose, user, notify }) {
+    const [sel, setSel] = useState(null);
+    const [payMethod, setPayMethod] = useState(null);
+    const [form, setForm] = useState({ playerId: '', email: '', name: '' });
+    const [step, setStep] = useState(1);
+    const [msg, setMsg] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    // For eFootball use static packages
+    const displayPackages = gameId === 'ef' ? EF_PACKAGES : packages;
+
+    function handle(e) { setForm(f => ({ ...f, [e.target.name]: e.target.value })); }
+
+    async function confirm() {
+      const idVal = gameId === 'ef' ? form.email : form.playerId;
+      if (!sel) { notify('يرجى اختيار باقة', 'error'); return; }
+      if (!payMethod) { notify('يرجى اختيار طريقة الدفع', 'error'); return; }
+      if (!form.name.trim()) { notify('يرجى إدخال الاسم', 'error'); return; }
+      if (!idVal) { notify(gameId === 'ef' ? 'يرجى إدخال البريد الإلكتروني' : 'يرجى إدخال معرّف اللاعب', 'error'); return; }
+
+      const pkg = displayPackages.find(p => p.id === sel);
+      const date = new Date().toLocaleString('ar-DZ');
+      const payLabel = PAYMENT_METHODS.find(p => p.id === payMethod)?.name || payMethod;
+      const idLine = gameId === 'ef' ? `📧 حساب Konami: ${form.email}` : `🆔 معرّف اللاعب: ${form.playerId}`;
+      const m = `🎮 *طلب شحن - GameCharge*\n\n🎯 اللعبة: ${GAME_NAMES[gameId]}\n📦 الباقة: ${pkg.amount}\n💰 السعر: ${pkg.price}\n💳 طريقة الدفع: ${payLabel}\n${idLine}\n👤 الاسم: ${form.name}\n📅 التاريخ: ${date}\n\n✅ شكراً لثقتك في GameCharge!`;
+
+      setLoading(true);
+      const orderId = 'ORD' + Date.now();
+      const { error } = await sb.from('orders').insert({
+        id: orderId,
+        user_id: user.id,
+        game: GAME_NAMES[gameId],
+        game_id: gameId,
+        package: pkg.amount,
+        price: pkg.price,
+        player_id: idVal,
+        name: form.name,
+        payment_method: payMethod,
+        status: 'pending'
+      });
+      setLoading(false);
+
+      if (error) { notify('فشل إرسال الطلب: ' + error.message, 'error'); return; }
+      setMsg(m);
+      setStep(3);
+    }
+
+    const color = GAME_COLORS[gameId];
+
+    return (
+      <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+        <div className="modal-box">
+          <div className="modal-header">
+            <div className="modal-title">
+              <span style={{ fontSize: '1.4rem' }}>{GAME_ICONS[gameId]}</span>
+              شحن {GAME_NAMES[gameId]}
+            </div>
+            <button className="modal-close" onClick={onClose}>✕</button>
+          </div>
+          <div className="modal-body">
+            {step === 3 ? (
+              <div style={{ textAlign: 'center', padding: '1rem 0' }}>
+                <div style={{ fontSize: '3.5rem', marginBottom: '.75rem', animation: 'popIn .5s ease' }}>🎉</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#22c55e', marginBottom: '.5rem' }}>تم تأكيد طلبك!</div>
+                <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: '.875rem' }}>أرسل طلبك عبر إحدى المنصات وسيتم معالجته خلال 24 إلى 48 ساعة</p>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: '1rem', marginBottom: '1.5rem', textAlign: 'right', fontSize: '.8rem', color: 'var(--text-secondary)', lineHeight: 2, whiteSpace: 'pre-wrap', direction: 'rtl', wordBreak: 'break-word' }}>{msg}</div>
+                <div style={{ display: 'flex', gap: '.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <button className="btn btn-lg btn-wa" onClick={() => window.open(`https://wa.me/213656635272?text=${encodeURIComponent(msg)}`, '_blank')}>📱 واتساب</button>
+                  <button className="btn btn-lg btn-tg" onClick={() => window.open(`https://t.me/BrahimDehanidz?text=${encodeURIComponent(msg)}`, '_blank')}>✈️ تيليجرام</button>
+                </div>
+                <button className="btn btn-ghost btn-full" style={{ marginTop: '1rem' }} onClick={onClose}>إغلاق</button>
+              </div>
+            ) : (
+              <>
+                {/* Warning */}
+                <div className="warn-box">
+                  <strong>⚠️ تنبيه مهم:</strong> الخطأ في المعلومات المُدخلة يؤدي إلى فقدان المبلغ ولا يُسترجع.<br />
+                  📅 مدة الشحن: <strong>24 إلى 48 ساعة</strong> &nbsp;|&nbsp; 🕐 أوقات العمل: <strong>7 صباحاً – 11 مساءً</strong><br />
+                  💳 <strong>الدفع أولاً قبل الشحن</strong>
+                </div>
+
+                {/* Promo reminder inside modal */}
+                <div className="promo-modal-box">
+                  <span style={{ fontSize: '1.5rem' }}>🎁</span>
+                  <span>عرض خاص: <strong>اشحن 5 مرات واحصل على الشحنة السادسة مجاناً!</strong> تواصل معنا عبر واتساب أو تيليجرام للاستفادة.</span>
+                </div>
+
+                {/* Packages */}
+                <div className="section-title" style={{ fontSize: '1rem', marginBottom: '1rem' }}>اختر العرض</div>
+
+                {gameId === 'ef' ? (
+                  /* eFootball: single special package display */
+                  <div>
+                    {EF_PACKAGES.map(p => (
+                      <div key={p.id}
+                        className={`ef-package-card${sel === p.id ? ' selected' : ''}`}
+                        onClick={() => setSel(p.id)}
+                        style={{ position: 'relative' }}>
+                        {sel === p.id && (
+                          <div style={{ position: 'absolute', top: 10, left: 10, background: '#00a8e8', color: '#fff', width: 22, height: 22, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '.75rem', fontWeight: 800 }}>✓</div>
+                        )}
+                        <div style={{ fontSize: '2.5rem', marginBottom: '.5rem' }}>⚽</div>
+                        <div style={{ fontSize: '1.3rem', fontWeight: 900, marginBottom: '.4rem', color: '#00a8e8' }}>{p.rate}</div>
+                        <div style={{ fontSize: '.9rem', color: 'var(--text-secondary)' }}>
+                          أدفع بالدولار — يُحتسب بـ <strong style={{ color: 'var(--accent-cyan)' }}>300 دج لكل دولار</strong>
+                        </div>
+                        <div style={{ marginTop: '.75rem', display: 'inline-block', background: 'rgba(0,168,232,.15)', border: '1px solid rgba(0,168,232,.3)', color: '#00a8e8', borderRadius: 8, padding: '.35rem .9rem', fontSize: '.8rem', fontWeight: 700 }}>
+                          اختر هذا العرض ✔
+                        </div>
+                      </div>
+                    ))}
+                    <div className="info-box" style={{ marginTop: '.75rem' }}>
+                      💡 مثال: إذا أردت شحن <strong>5$</strong> فالمبلغ = <strong>1500 دج</strong>. حدّد المبلغ بالدولار عند التواصل.
+                    </div>
+                  </div>
+                ) : (
+                  <div className="packages-grid">
+                    {displayPackages.map(p => (
+                      <div key={p.id} className={`package-card${sel === p.id ? ' selected' : ''}`} onClick={() => setSel(p.id)}>
+                        {p.popular && <div className="package-popular">الأكثر طلباً</div>}
+                        <div className="package-icon">{p.icon}</div>
+                        <div className="package-amount">{p.amount}</div>
+                        <div className="package-price" style={{ background: `rgba(${gameId === 'ff' ? '255,107,0' : '245,197,24'},.15)`, color }}>{p.price}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="divider" />
+
+                {/* Payment method */}
+                <div className="section-title" style={{ fontSize: '1rem', marginBottom: '1rem' }}>طريقة الدفع</div>
+                <div className="payment-grid" style={{ marginBottom: '1.25rem' }}>
+                  {PAYMENT_METHODS.map(pm => (
+                    <div key={pm.id} className={`payment-card${payMethod === pm.id ? ' selected' : ''}`} onClick={() => setPayMethod(pm.id)}>
+                      <div className="payment-icon">{pm.icon}</div>
+                      <div className="payment-name">{pm.name}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="divider" />
+
+                {/* Account info */}
+                <div className="section-title" style={{ fontSize: '1rem', marginBottom: '1rem' }}>معلومات الحساب</div>
+                <div className="form-group">
+                  <label className="form-label">الاسم الكامل *</label>
+                  <input className="form-input" name="name" value={form.name} onChange={handle} placeholder="أدخل اسمك الكريم" />
+                </div>
+                {gameId === 'ef' ? (
+                  <div className="form-group">
+                    <label className="form-label">البريد الإلكتروني لـ Konami *</label>
+                    <input className="form-input" name="email" type="email" value={form.email} onChange={handle} placeholder="example@email.com" style={{ direction: 'ltr', textAlign: 'left' }} />
+                  </div>
+                ) : (
+                  <div className="form-group">
+                    <label className="form-label">معرّف اللاعب (Player ID) *</label>
+                    <input className="form-input" name="playerId" value={form.playerId} onChange={handle} placeholder="أدخل معرّفك في اللعبة" style={{ direction: 'ltr', textAlign: 'right' }} />
+                  </div>
+                )}
+
+                {sel && (() => {
+                  const pkg = displayPackages.find(p => p.id === sel);
+                  return (
+                    <div style={{ background: 'rgba(0,212,255,.05)', border: '1px solid rgba(0,212,255,.2)', borderRadius: 12, padding: '1rem', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: 'var(--text-secondary)', fontSize: '.875rem' }}>السعر / الوحدة</span>
+                      <span style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--accent-cyan)' }}>{pkg?.price}</span>
+                    </div>
+                  );
+                })()}
+
+                <button className="btn btn-primary btn-full btn-lg" onClick={confirm} disabled={loading}>
+                  {loading ? <><span className="loader" /> جاري الإرسال...</> : 'تأكيد الطلب ✅'}
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function UserDashboard({ user, onBack }) {
+    const [orders, setOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
+    useEffect(() => {
+      async function fetchOrders() {
+        setLoading(true);
+        const { data, error } = await sb.from('orders').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+        if (!error) setOrders(data || []);
+        setLoading(false);
+      }
+      fetchOrders();
+    }, [user.id]);
+    const sl = s => s === 'pending' ? 'قيد المعالجة' : s === 'done' ? 'مكتمل' : 'مرفوض';
+    const sc = s => s === 'pending' ? 'status-pending' : s === 'done' ? 'status-done' : 'status-rejected';
+    return (
+      <div className="dashboard">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+          <div>
+            <div style={{ fontSize: '1.6rem', fontWeight: 800 }}>👋 أهلاً، {user.name}</div>
+            <div style={{ color: 'var(--text-secondary)', fontSize: '.875rem', marginTop: '.25rem' }}>لوحة حسابك الشخصية</div>
+          </div>
+          <button className="btn btn-ghost" onClick={onBack}>← الرئيسية</button>
+        </div>
+        <div className="stats-grid">
+          {[
+            { icon: '📋', label: 'إجمالي الطلبات', val: orders.length, color: 'var(--accent-cyan)' },
+            { icon: '⏳', label: 'قيد المعالجة', val: orders.filter(o => o.status === 'pending').length, color: '#f5c518' },
+            { icon: '✅', label: 'مكتملة', val: orders.filter(o => o.status === 'done').length, color: '#22c55e' },
+            { icon: '❌', label: 'مرفوضة', val: orders.filter(o => o.status === 'rejected').length, color: '#ef4444' },
+          ].map((s, i) => (
+            <div key={i} className="stat-card" style={{ animationDelay: `${i*.1}s` }}>
+              <div style={{ fontSize: '2rem', marginBottom: '.5rem' }}>{s.icon}</div>
+              <div style={{ fontSize: '.8rem', color: 'var(--text-secondary)', marginBottom: '.4rem' }}>{s.label}</div>
+              <div style={{ fontSize: '1.8rem', fontWeight: 900, color: s.color }}>{s.val}</div>
+            </div>
+          ))}
+        </div>
+        <div className="orders-table">
+          <div className="orders-table-header">📦 سجل الطلبات ({orders.length})</div>
+          {loading ? (
+            <div className="empty-state"><span className="loader" /></div>
+          ) : orders.length === 0 ? (
+            <div className="empty-state"><div style={{ fontSize: '3rem', opacity:.5, marginBottom:'1rem' }}>📭</div><div>لا توجد طلبات بعد</div></div>
+          ) : (
+            <div className="table-overflow">
+              <table className="table">
+                <thead>
+                  <tr><th>رقم الطلب</th><th>اللعبة</th><th>الباقة</th><th>السعر</th><th className="table-hide-mob">طريقة الدفع</th><th className="table-hide-mob">التاريخ</th><th>الحالة</th></tr>
+                </thead>
+                <tbody>
+                  {orders.map(o => (
+                    <tr key={o.id}>
+                      <td style={{ fontSize: '.7rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{o.id.slice(-8)}</td>
+                      <td style={{ fontWeight: 600 }}>{o.game}</td>
+                      <td>{o.package}</td>
+                      <td style={{ color: 'var(--accent-cyan)', fontWeight: 700 }}>{o.price}</td>
+                      <td className="table-hide-mob" style={{ fontSize: '.8rem', color: 'var(--text-secondary)' }}>{PAYMENT_METHODS.find(p=>p.id===o.payment_method)?.name || o.payment_method || '-'}</td>
+                      <td className="table-hide-mob" style={{ fontSize: '.75rem', color: 'var(--text-muted)' }}>{new Date(o.created_at).toLocaleString('ar-DZ')}</td>
+                      <td><span className={`status ${sc(o.status)}`}>{sl(o.status)}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  function AdminPanel({ onBack, notify }) {
+    const [tab, setTab] = useState('orders');
+    const [packages, setPackagesState] = useState({ ff: [], pubg: [], ef: [] });
+    const [orders, setOrdersState] = useState([]);
+    const [users, setUsersState] = useState([]);
+    const [loadingOrders, setLoadingOrders] = useState(false);
+
+    async function fetchAll() {
+      setLoadingOrders(true);
+      const [pkgRes, ordRes, usrRes] = await Promise.all([
+        sb.from('packages').select('*').order('created_at'),
+        sb.from('orders').select('*').order('created_at', { ascending: false }),
+        sb.from('profiles').select('*')
+      ]);
+      if (!pkgRes.error) {
+        const grouped = { ff: [], pubg: [], ef: [] };
+        (pkgRes.data || []).forEach(p => { if (grouped[p.game_id]) grouped[p.game_id].push(p); });
+        setPackagesState(grouped);
+      }
+      if (!ordRes.error) setOrdersState(ordRes.data || []);
+      if (!usrRes.error) setUsersState(usrRes.data || []);
+      setLoadingOrders(false);
+    }
+
+    useEffect(() => { fetchAll(); }, [tab]);
+
+    const [addGame, setAddGame] = useState('ff');
+    const [newPkg, setNewPkg] = useState({ amount: '', price: '', icon: '💎', popular: false });
+
+    async function doAddPkg() {
+      if (!newPkg.amount.trim() || !newPkg.price.trim()) { notify('يرجى ملء حقلي الكمية والسعر', 'error'); return; }
+      const id = addGame + Date.now();
+      const { error } = await sb.from('packages').insert({ id, game_id: addGame, amount: newPkg.amount, price: newPkg.price, icon: newPkg.icon, popular: newPkg.popular });
+      if (error) { notify('فشل إضافة الباقة: ' + error.message, 'error'); return; }
+      setNewPkg({ amount: '', price: '', icon: '💎', popular: false });
+      notify('✅ تمت إضافة الباقة بنجاح', 'success');
+      fetchAll();
+    }
+
+    async function doDelPkg(id) {
+      const { error } = await sb.from('packages').delete().eq('id', id);
+      if (error) { notify('فشل الحذف: ' + error.message, 'error'); return; }
+      notify('تم حذف الباقة', 'info');
+      fetchAll();
+    }
+
+    async function doTogglePopular(id, current) {
+      const { error } = await sb.from('packages').update({ popular: !current }).eq('id', id);
+      if (error) { notify('فشل التحديث', 'error'); return; }
+      fetchAll();
+    }
+
+    async function doUpdateStatus(id, status) {
+      const { error } = await sb.from('orders').update({ status }).eq('id', id);
+      if (error) { notify('فشل التحديث: ' + error.message, 'error'); return; }
+      notify('تم تحديث حالة الطلب ✅', 'success');
+      setOrdersState(prev => prev.map(o => o.id === id ? { ...o, status } : o));
+    }
+
+    async function doDeleteOrder(id) {
+      const { error } = await sb.from('orders').delete().eq('id', id);
+      if (error) { notify('فشل الحذف: ' + error.message, 'error'); return; }
+      setOrdersState(prev => prev.filter(o => o.id !== id));
+      notify('تم حذف الطلب', 'info');
+    }
+
+    const sl = s => s === 'pending' ? 'قيد المعالجة' : s === 'done' ? 'مكتمل' : 'مرفوض';
+    const TABS = [
+      { id: 'orders', label: 'الطلبات', icon: '📋' },
+      { id: 'packages', label: 'الباقات', icon: '📦' },
+      { id: 'users', label: 'المستخدمون', icon: '👥' },
+    ];
+
+    return (
+      <div style={{ minHeight: '100vh' }}>
+        <div className="admin-sidebar">
+          <div style={{ fontWeight: 800, fontSize: '.75rem', color: 'var(--text-muted)', marginBottom: '1rem', paddingRight: '.5rem', letterSpacing: '1px', textTransform: 'uppercase' }}>لوحة التحكم</div>
+          {TABS.map(t => (
+            <div key={t.id} className={`admin-nav-item${tab === t.id ? ' active' : ''}`} onClick={() => setTab(t.id)}>
+              <span>{t.icon}</span>{t.label}
+            </div>
+          ))}
+          <div style={{ borderTop: '1px solid var(--border)', marginTop: '1.5rem', paddingTop: '1rem' }}>
+            <div className="admin-nav-item" onClick={onBack}><span>←</span>العودة للرئيسية</div>
+          </div>
+          <div style={{ marginTop: '1.5rem', padding: '1rem', background: 'rgba(0,212,255,.05)', border: '1px solid rgba(0,212,255,.1)', borderRadius: 12 }}>
+            <div style={{ fontSize: '.75rem', color: 'var(--text-muted)', marginBottom: '.75rem', fontWeight: 700 }}>ملخص سريع</div>
+            {[
+              { label: 'الطلبات', val: orders.length, color: 'var(--accent-cyan)' },
+              { label: 'المستخدمون', val: users.length, color: 'var(--accent-purple)' },
+              { label: 'الباقات', val: Object.values(packages).flat().length, color: 'var(--accent-pink)' },
+            ].map((s, i) => (
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '.4rem', fontSize: '.8rem' }}>
+                <span style={{ color: 'var(--text-secondary)' }}>{s.label}</span>
+                <span style={{ fontWeight: 700, color: s.color }}>{s.val}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="admin-main">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
+            <h1 style={{ fontSize: '1.4rem', fontWeight: 800 }}>⚙️ لوحة المشرف</h1>
+            <button className="btn btn-ghost" style={{ marginRight: 'auto' }} onClick={onBack}>← الرئيسية</button>
+          </div>
+
+          <div className="mob-tabs">
+            {TABS.map(t => (
+              <button key={t.id} className={`mob-tab${tab === t.id ? ' active' : ''}`} onClick={() => setTab(t.id)}>
+                {t.icon} {t.label}
+              </button>
+            ))}
+          </div>
+
+          {tab === 'orders' && (
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '.5rem' }}>
+                <div className="section-title" style={{ marginBottom: 0 }}>إدارة الطلبات</div>
+                <div style={{ display: 'flex', gap: '.75rem', fontSize: '.85rem', flexWrap: 'wrap' }}>
+                  <span className="status status-pending">⏳ {orders.filter(o => o.status === 'pending').length} معلقة</span>
+                  <span className="status status-done">✅ {orders.filter(o => o.status === 'done').length} مكتملة</span>
+                </div>
+              </div>
+              <div className="orders-table">
+                {loadingOrders ? (
+                  <div className="empty-state"><span className="loader" /></div>
+                ) : orders.length === 0 ? (
+                  <div className="empty-state"><div style={{ fontSize:'3rem',opacity:.5,marginBottom:'1rem' }}>📭</div><div>لا توجد طلبات بعد</div></div>
+                ) : (
+                  <div className="table-overflow">
+                    <table className="table">
+                      <thead>
+                        <tr><th>#</th><th>اللعبة</th><th>الباقة</th><th>المعرّف</th><th className="table-hide-mob">الدفع</th><th className="table-hide-mob">الاسم</th><th>الحالة</th><th>إجراء</th></tr>
+                      </thead>
+                      <tbody>
+                        {orders.map((o, idx) => (
+                          <tr key={o.id}>
+                            <td style={{ fontSize: '.7rem', color: 'var(--text-muted)' }}>{idx + 1}</td>
+                            <td style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>{o.game}</td>
+                            <td style={{ whiteSpace: 'nowrap' }}>{o.package}</td>
+                            <td style={{ fontSize: '.8rem', direction: 'ltr', textAlign: 'right', maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{o.player_id}</td>
+                            <td className="table-hide-mob" style={{ fontSize: '.8rem', color: 'var(--text-secondary)' }}>{PAYMENT_METHODS.find(p=>p.id===o.payment_method)?.name || '-'}</td>
+                            <td className="table-hide-mob" style={{ color: 'var(--text-secondary)', fontSize: '.85rem' }}>{o.name}</td>
+                            <td>
+                              <select value={o.status} onChange={e => doUpdateStatus(o.id, e.target.value)}
+                                className="form-input" style={{ padding: '.25rem .5rem', fontSize: '.75rem', width: 'auto', cursor: 'pointer' }}>
+                                <option value="pending">⏳ معالجة</option>
+                                <option value="done">✅ مكتمل</option>
+                                <option value="rejected">❌ مرفوض</option>
+                              </select>
+                            </td>
+                            <td>
+                              <button className="btn btn-danger" style={{ padding: '.25rem .625rem', fontSize: '.75rem' }} onClick={() => doDeleteOrder(o.id)}>🗑️</button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {tab === 'packages' && (
+            <div>
+              <div className="section-title">إدارة الباقات</div>
+              <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '1.5rem', marginBottom: '1.5rem' }}>
+                <div style={{ fontWeight: 700, marginBottom: '1rem', fontSize: '1rem' }}>➕ إضافة باقة جديدة</div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: '.75rem', marginBottom: '1rem' }}>
+                  <div>
+                    <label className="form-label">اللعبة</label>
+                    <select className="form-input" value={addGame} onChange={e => setAddGame(e.target.value)}>
+                      <option value="ff">🔥 Free Fire</option>
+                      <option value="pubg">🎯 PUBG Mobile</option>
+                      <option value="ef">⚽ eFootball</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="form-label">الكمية *</label>
+                    <input className="form-input" value={newPkg.amount} onChange={e => setNewPkg(p => ({ ...p, amount: e.target.value }))} placeholder="مثل: 100 ماسة" />
+                  </div>
+                  <div>
+                    <label className="form-label">السعر *</label>
+                    <input className="form-input" value={newPkg.price} onChange={e => setNewPkg(p => ({ ...p, price: e.target.value }))} placeholder="مثل: 280 دج" />
+                  </div>
+                  <div>
+                    <label className="form-label">أيقونة</label>
+                    <input className="form-input" value={newPkg.icon} onChange={e => setNewPkg(p => ({ ...p, icon: e.target.value }))} placeholder="💎" />
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '.5rem', cursor: 'pointer', fontSize: '.875rem', color: 'var(--text-secondary)' }}>
+                    <input type="checkbox" checked={newPkg.popular} onChange={e => setNewPkg(p => ({ ...p, popular: e.target.checked }))} style={{ width: 16, height: 16, accentColor: 'var(--accent-cyan)' }} />
+                    تمييز كـ "الأكثر طلباً"
+                  </label>
+                </div>
+                <button className="btn btn-primary" onClick={doAddPkg}>إضافة الباقة ➕</button>
+              </div>
+
+              {['ff', 'pubg'].map(gid => (
+                <div key={gid} style={{ marginBottom: '2rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem', marginBottom: '1rem' }}>
+                    <span style={{ fontSize: '1.5rem' }}>{GAME_ICONS[gid]}</span>
+                    <span style={{ fontWeight: 800, fontSize: '1.05rem' }}>{GAME_NAMES[gid]}</span>
+                    <span className="status status-pending" style={{ marginRight: 'auto' }}>{(packages[gid] || []).length} باقة</span>
+                  </div>
+                  {(packages[gid] || []).length === 0 ? (
+                    <div style={{ color: 'var(--text-muted)', fontSize: '.875rem', padding: '1rem', background: 'var(--bg-card)', borderRadius: 12, textAlign: 'center' }}>لا توجد باقات - أضف باقة جديدة أعلاه</div>
+                  ) : (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: '.75rem' }}>
+                      {(packages[gid] || []).map(p => (
+                        <div key={p.id} className="offer-row">
+                          <span style={{ fontSize: '1.5rem' }}>{p.icon}</span>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontWeight: 700, fontSize: '.9rem' }}>{p.amount}</div>
+                            <div style={{ color: 'var(--accent-cyan)', fontSize: '.85rem', fontWeight: 600 }}>{p.price}</div>
+                            {p.popular && <span style={{ fontSize: '.7rem', color: 'var(--accent-orange)' }}>★ الأكثر طلباً</span>}
+                          </div>
+                          <div style={{ display: 'flex', gap: '.4rem', flexShrink: 0 }}>
+                            <button className={`btn ${p.popular ? 'btn-success' : 'btn-ghost'}`} style={{ padding: '.25rem .5rem', fontSize: '.7rem' }} onClick={() => doTogglePopular(p.id, p.popular)} title="تمييز">★</button>
+                            <button className="btn btn-danger" style={{ padding: '.25rem .5rem', fontSize: '.7rem' }} onClick={() => doDelPkg(p.id)}>🗑️</button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              {/* eFootball fixed package info */}
+              <div style={{ marginBottom: '2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem', marginBottom: '1rem' }}>
+                  <span style={{ fontSize: '1.5rem' }}>⚽</span>
+                  <span style={{ fontWeight: 800, fontSize: '1.05rem' }}>eFootball</span>
+                  <span className="status status-done" style={{ marginRight: 'auto' }}>سعر ثابت</span>
+                </div>
+                <div style={{ background: 'rgba(0,168,232,.07)', border: '1px solid rgba(0,168,232,.25)', borderRadius: 12, padding: '1.25rem', fontSize: '.875rem', color: 'var(--text-secondary)' }}>
+                  ⚽ eFootball — سعر ثابت: <strong style={{ color: '#00a8e8' }}>1$ = 300 دج</strong><br />
+                  هذا العرض ثابت ولا يحتاج إلى إدارة من هنا.
+                </div>
+              </div>
+            </div>
+          )}
+
+          {tab === 'users' && (
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '.5rem' }}>
+                <div className="section-title" style={{ marginBottom: 0 }}>إدارة المستخدمين</div>
+                <span className="status status-pending">{users.length} مستخدم</span>
+              </div>
+              <div className="orders-table">
+                {users.length === 0 ? (
+                  <div className="empty-state"><div style={{ fontSize:'3rem',opacity:.5,marginBottom:'1rem' }}>👥</div><div>لا يوجد مستخدمون</div></div>
+                ) : (
+                  <div className="table-overflow">
+                    <table className="table">
+                      <thead><tr><th>#</th><th>الاسم</th><th>المعرّف</th><th>الدور</th><th>عدد الطلبات</th></tr></thead>
+                      <tbody>
+                        {users.map((u, i) => (
+                          <tr key={u.id}>
+                            <td style={{ color: 'var(--text-muted)', fontSize: '.8rem' }}>{i + 1}</td>
+                            <td style={{ fontWeight: 700 }}>{u.name}</td>
+                            <td style={{ color: 'var(--text-secondary)', fontFamily: 'monospace', fontSize: '.75rem' }}>{u.id.slice(0,8)}...</td>
+                            <td><span className={`status ${u.role === 'admin' ? 'status-done' : 'status-pending'}`}>{u.role === 'admin' ? '👑 مشرف' : '👤 مستخدم'}</span></td>
+                            <td style={{ fontWeight: 700, color: 'var(--accent-cyan)' }}>{orders.filter(o => o.user_id === u.id).length}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  function Navbar({ user, onAuth, onLogout, onDashboard, onAdmin }) {
+    const [menu, setMenu] = useState(false);
+    const ref = useRef();
+    useEffect(() => {
+      function h(e) { if (ref.current && !ref.current.contains(e.target)) setMenu(false); }
+      document.addEventListener('mousedown', h);
+      return () => document.removeEventListener('mousedown', h);
+    }, []);
+    const avatarContent = user?.avatar ? <img src={user.avatar} alt={user.name} /> : (user?.name?.[0] || '?');
+    return (
+      <nav className="navbar">
+        <div className="navbar-logo">🎮 Game<span>Charge</span></div>
+        <div className="navbar-actions">
+          {user ? (
+            <div className="user-menu-wrap" ref={ref}>
+              <div className="user-avatar" onClick={() => setMenu(m => !m)}>{avatarContent}</div>
+              {menu && (
+                <div className="user-dropdown">
+                  <div style={{ padding: '.5rem .875rem .25rem', fontSize: '.75rem', color: 'var(--text-muted)', borderBottom: '1px solid var(--border)', marginBottom: '.25rem' }}>{user.name}</div>
+                  <div className="user-dd-item" onClick={() => { onDashboard(); setMenu(false); }}>📋 طلباتي</div>
+                  {user.role === 'admin' && <div className="user-dd-item" onClick={() => { onAdmin(); setMenu(false); }}>⚙️ لوحة التحكم</div>}
+                  <div className="user-dd-item danger" onClick={() => { onLogout(); setMenu(false); }}>🚪 خروج</div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button className="btn btn-primary" onClick={() => onAuth()}>دخول 🚀</button>
+          )}
+        </div>
+      </nav>
+    );
+  }
+
+  function HomePage({ onGame, packages }) {
+    return (
+      <>
+        <div className="hero">
+          <div className="hero-bg" />
+          <h1 className="hero-title">منصة <span className="gradient-text">شحن الألعاب</span><br />الأولى في الجزائر</h1>
+          <p className="hero-sub">شحن فوري وآمن لأفضل الألعاب بأسعار لا تقبل المنافسة</p>
+          <div className="hero-badges">
+            <span className="badge badge-cyan">⚡ شحن خلال 24-48 ساعة</span>
+            <span className="badge badge-purple">🛡️ معاملات آمنة 100%</span>
+            <span className="badge badge-pink">🎮 دعم متواصل</span>
+            <span className="badge badge-orange">🕐 7 صباحاً – 11 مساءً</span>
+          </div>
+        </div>
+
+        {/* Promo Banner */}
+        <PromoBanner />
+
+        <div className="section">
+          <div className="section-title">اختر لعبتك</div>
+          <div className="games-grid">
+            {['ff', 'pubg', 'ef'].map((gid, i) => {
+              return (
+                <div key={gid} className={`game-card ${GAME_CLASSES[gid]}`}
+                  onClick={() => onGame(gid)}
+                  style={{ animationDelay: `${.1*(i+1)}s`, cursor: 'pointer' }}>
+                  <div className="game-card-img">
+                    <img src={GAME_IMAGES[gid]} alt={GAME_NAMES[gid]}
+                      onError={e => { e.target.style.display='none'; }}
+                    />
+                    <div className="game-card-overlay" />
+                  </div>
+                  <div className="game-card-body">
+                    <div className="game-card-name">{GAME_NAMES[gid]}</div>
+                    <div className="game-card-desc">{GAME_DESCS[gid]}</div>
+                    {gid === 'ef' && (
+                      <div style={{ marginBottom: '.75rem', display: 'inline-flex', alignItems: 'center', gap: '.4rem', background: 'rgba(0,168,232,.12)', border: '1px solid rgba(0,168,232,.3)', borderRadius: 8, padding: '.25rem .75rem', fontSize: '.8rem', color: '#00a8e8', fontWeight: 700 }}>
+                        💱 1$ = 300 دج
+                      </div>
+                    )}
+                    <button className={`game-card-btn ${GAME_BTN[gid]}`}>
+                      اشحن الآن ⚡
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div className="section" style={{ paddingTop: 0 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: '1rem' }}>
+            {[
+              { icon: '⚡', title: 'شحن سريع', desc: 'معالجة طلبك خلال 24 إلى 48 ساعة' },
+              { icon: '🔒', title: 'أمان تام', desc: 'معاملاتك مشفرة ومحمية بالكامل' },
+              { icon: '🎁', title: 'عرض 5+1 مجاناً', desc: 'اشحن 5 مرات واحصل على الـ 6 مجاناً!' },
+              { icon: '📱', title: '3 طرق دفع', desc: 'فليكسي، باريدي موب، أو كاش' },
+            ].map((f, i) => (
+              <div key={i} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '1.5rem', animation: `fadeIn .5s ${.1*i}s ease both` }}>
+                <div style={{ fontSize: '2rem', marginBottom: '.75rem' }}>{f.icon}</div>
+                <div style={{ fontWeight: 700, marginBottom: '.4rem' }}>{f.title}</div>
+                <div style={{ fontSize: '.875rem', color: 'var(--text-secondary)' }}>{f.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <footer className="footer">
+          <div style={{ marginBottom: '.5rem' }}>🎮 GameCharge — منصة شحن الألعاب الاحترافية</div>
+          <div style={{ marginBottom: '.4rem', color: 'var(--text-muted)', fontSize: '.8rem' }}>
+            📞 للدعم والشكاوي: واتساب أو تيليجرام (الأيقونات أسفل اليسار)
+          </div>
+          <div>جميع الحقوق محفوظة © {new Date().getFullYear()}</div>
+        </footer>
+      </>
+    );
+  }
+
+  function App() {
+    const [notifs, addN, rmN] = useNotify();
+    const [showWelcome, setShowWelcome] = useState(() => !ls('gc_welcomed', false));
+    const [showAuth, setShowAuth] = useState(false);
+    const [user, setUser] = useState(null);
+    const [authLoading, setAuthLoading] = useState(true);
+    const [page, setPage] = useState('home');
+    const [gameId, setGameId] = useState(null);
+    const [packages, setPackages] = useState({ ff: [], pubg: [], ef: [] });
+
+    async function fetchPackages() {
+      try {
+        const { data, error } = await sb.from('packages').select('*');
+        if (error) throw error;
+        if (data) {
+          const formatted = { ff: [], pubg: [], ef: [] };
+          data.forEach(p => {
+            if (p.game_id && formatted[p.game_id] !== undefined) {
+              formatted[p.game_id].push({
+                id: p.id, game_id: p.game_id, amount: p.amount, price: p.price,
+                icon: p.icon || '💎',
+                popular: p.popular === true || p.popular === 'TRUE' || p.popular === 1
+              });
+            }
+          });
+          setPackages(formatted);
+        }
+      } catch (err) { console.error("خطأ أثناء تحديث الباقات:", err.message); }
+    }
+
+    async function resolveProfile(authUser) {
+      const { data: existing } = await sb.from('profiles').select('*').eq('id', authUser.id).single();
+      if (existing) { setUser(existing); return; }
+      const meta = authUser.user_metadata || {};
+      const name = meta.full_name || meta.name || authUser.email?.split('@')[0] || 'مستخدم';
+      const username = authUser.email?.split('@')[0] || 'user_' + authUser.id.slice(0, 6);
+      const newProfile = { id: authUser.id, name, username, role: 'user' };
+      const { data: inserted } = await sb.from('profiles').insert(newProfile).select().single();
+      setUser(inserted || newProfile);
+    }
+
+    useEffect(() => {
+      fetchPackages();
+      const { data: { subscription } } = sb.auth.onAuthStateChange(async (event, session) => {
+        if (session?.user) await resolveProfile(session.user);
+        else setUser(null);
+        setAuthLoading(false);
+      });
+      sb.auth.getSession().then(async ({ data: { session } }) => {
+        if (session?.user) await resolveProfile(session.user);
+        setAuthLoading(false);
+      });
+      return () => subscription.unsubscribe();
+    }, []);
+
+    const prevUser = useRef(null);
+    useEffect(() => {
+      if (!authLoading) {
+        if (user && !prevUser.current) addN(`أهلاً ${user.name}! تم تسجيل الدخول 🎉`, 'success');
+        else if (!user && prevUser.current) addN('تم تسجيل الخروج', 'info');
+        prevUser.current = user;
+      }
+    }, [user, authLoading]);
+
+    async function logout() { await sb.auth.signOut(); setUser(null); setPage('home'); }
+
+    async function openGame(gid) {
+      if (!user) { addN('يرجى تسجيل الدخول أولاً لتتمكن من الشحن 🔒', 'info'); setShowAuth(true); return; }
+      if (gid !== 'ef') {
+        try {
+          const { data, error } = await sb.from('packages').select('*').eq('game_id', gid);
+          if (error) throw error;
+          if (data) {
+            const fmt = data.map(p => ({
+              id: p.id, game_id: p.game_id, amount: p.amount, price: p.price,
+              icon: p.icon || '💎',
+              popular: p.popular === true || p.popular === 'TRUE' || p.popular === 1
+            }));
+            setPackages(prev => ({ ...prev, [gid]: fmt }));
+          }
+        } catch (err) { console.error("خطأ أثناء جلب الباقات:", err.message); }
+      }
+      setGameId(gid);
+    }
+
+    if (authLoading) {
+      return (
+        <div className="loading-screen">
+          <div style={{ fontSize: '2.5rem', animation: 'float 2s ease infinite' }}>🎮</div>
+          <div style={{ color: 'var(--text-secondary)', fontSize: '.9rem' }}>جاري التحميل...</div>
+          <span className="loader" />
+        </div>
+      );
+    }
+
+    return (
+      <div>
+        <Notifs list={notifs} rm={rmN} />
+        <FloatSupportBtns />
+        {showWelcome && <WelcomePopup onClose={() => { setShowWelcome(false); ss('gc_welcomed', true); }} />}
+        {showAuth && <AuthModal onClose={() => setShowAuth(false)} notify={addN} />}
+        {gameId && (
+          <OrderModal
+            gameId={gameId}
+            packages={packages[gameId] || []}
+            onClose={() => setGameId(null)}
+            user={user}
+            notify={addN}
+          />
+        )}
+        {page !== 'admin' && (
+          <Navbar
+            user={user}
+            onAuth={() => setShowAuth(true)}
+            onLogout={logout}
+            onDashboard={() => setPage('dashboard')}
+            onAdmin={() => setPage('admin')}
+          />
+        )}
+        {page === 'home' && <HomePage onGame={openGame} packages={packages} />}
+        {page === 'dashboard' && user && <UserDashboard user={user} onBack={() => setPage('home')} />}
+        {page === 'admin' && user?.role === 'admin' && <AdminPanel onBack={() => setPage('home')} notify={addN} />}
+        {page === 'admin' && user?.role !== 'admin' && (
+          <div className="dashboard" style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '3rem' }}>🚫</div>
+            <p style={{ marginTop: '1rem', color: 'var(--text-secondary)' }}>ليس لديك صلاحية الوصول.</p>
+            <button className="btn btn-ghost" style={{ marginTop: '1rem' }} onClick={() => setPage('home')}>← الرئيسية</button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  ReactDOM.render(<App />, document.getElementById('root'));
+</script>
+</body>
+</html>
